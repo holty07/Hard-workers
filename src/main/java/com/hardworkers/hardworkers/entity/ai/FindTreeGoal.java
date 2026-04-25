@@ -1,11 +1,13 @@
 package com.hardworkers.hardworkers.entity.ai;
 
 import com.hardworkers.hardworkers.HardWorkersConfig;
+import com.hardworkers.hardworkers.blockentity.LumberjackBlockEntity;
 import com.hardworkers.hardworkers.entity.LumberjackEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.EnumSet;
@@ -30,11 +32,18 @@ public class FindTreeGoal extends Goal {
     @Override
     public boolean canUse() {
         if (lumberjack.getTargetTree() != null) return false;
+        if (isStorageFull()) return false;
         if (searchCooldown > 0) {
             searchCooldown--;
             return false;
         }
         return true;
+    }
+
+    private boolean isStorageFull() {
+        Level level = lumberjack.level();
+        BlockEntity be = level.getBlockEntity(lumberjack.getHomePosition());
+        return be instanceof LumberjackBlockEntity storage && storage.isFull();
     }
 
     @Override

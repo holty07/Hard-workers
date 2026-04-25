@@ -1,17 +1,28 @@
 package com.hardworkers.hardworkers.block;
 
+import com.hardworkers.hardworkers.blockentity.LumberjackBlockEntity;
 import com.hardworkers.hardworkers.entity.LumberjackEntity;
+import com.hardworkers.hardworkers.init.ModBlockEntities;
 import com.hardworkers.hardworkers.init.ModEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 
-public class LumberjackBlock extends Block {
+import javax.annotation.Nullable;
+
+public class LumberjackBlock extends BaseEntityBlock {
 
     public LumberjackBlock() {
         super(BlockBehaviour.Properties.of()
@@ -20,6 +31,26 @@ public class LumberjackBlock extends Block {
             .strength(2.0f)
         );
     }
+
+    // -------------------------------------------------------------------------
+    // EntityBlock
+    // -------------------------------------------------------------------------
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new LumberjackBlockEntity(pos, state);
+    }
+
+    // Keep the normal cube model; BaseEntityBlock defaults to INVISIBLE.
+    @Override
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
+    }
+
+    // -------------------------------------------------------------------------
+    // Lifecycle
+    // -------------------------------------------------------------------------
 
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
@@ -37,6 +68,11 @@ public class LumberjackBlock extends Block {
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!level.isClientSide() && !state.is(newState.getBlock())) {
+            // Drop stored logs
+            if (level.getBlockEntity(pos) instanceof LumberjackBlockEntity be) {
+                Containers.dropContents(level, pos, be);
+            }
+            // Discard the associated lumberjack entity
             AABB searchArea = new AABB(pos).inflate(3.0);
             level.getEntitiesOfClass(LumberjackEntity.class, searchArea)
                 .stream()
@@ -44,5 +80,18 @@ public class LumberjackBlock extends Block {
                 .forEach(LumberjackEntity::discard);
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
+    }
+
+    // -------------------------------------------------------------------------
+    // Interaction — right-click shows storage status in the action bar
+    // -------------------------------------------------------------------------
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
+                                               Player player, BlockHitResult hitResult) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof LumberjackBlockEntity be) {
+            player.displayClientMessage(be.getStorageStatus(), true);
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 }

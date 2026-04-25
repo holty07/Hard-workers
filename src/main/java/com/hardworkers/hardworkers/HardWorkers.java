@@ -1,5 +1,6 @@
 package com.hardworkers.hardworkers;
 
+import com.hardworkers.hardworkers.init.ModBlockEntities;
 import com.hardworkers.hardworkers.init.ModBlocks;
 import com.hardworkers.hardworkers.init.ModEntities;
 import com.hardworkers.hardworkers.init.ModItems;
@@ -17,6 +18,7 @@ public class HardWorkers {
         ModBlocks.BLOCKS.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
         ModEntities.ENTITY_TYPES.register(modEventBus);
+        ModBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, HardWorkersConfig.SPEC);
     }

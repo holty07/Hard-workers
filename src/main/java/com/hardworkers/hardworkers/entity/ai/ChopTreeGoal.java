@@ -1,6 +1,7 @@
 package com.hardworkers.hardworkers.entity.ai;
 
 import com.hardworkers.hardworkers.HardWorkersConfig;
+import com.hardworkers.hardworkers.blockentity.LumberjackBlockEntity;
 import com.hardworkers.hardworkers.entity.LumberjackEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -11,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelEvent;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.*;
@@ -118,9 +120,9 @@ public class ChopTreeGoal extends Goal {
         );
 
         if (level instanceof ServerLevel serverLevel) {
-            Block.dropResources(state, serverLevel, logPos, null, lumberjack, ItemStack.EMPTY);
             level.setBlock(logPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
             level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, logPos, Block.getId(state));
+            depositLog(serverLevel, new ItemStack(state.getBlock().asItem(), 1));
         }
     }
 
@@ -134,6 +136,22 @@ public class ChopTreeGoal extends Goal {
 
         if (canPlant) {
             level.setBlock(plantPos, saplingType.defaultBlockState(), Block.UPDATE_ALL);
+        }
+    }
+
+    /**
+     * Sends the harvested log to the block entity's storage.
+     * Falls back to dropping the item on the ground if the storage is full or missing.
+     */
+    private void depositLog(ServerLevel level, ItemStack logItem) {
+        BlockEntity be = level.getBlockEntity(lumberjack.getHomePosition());
+        if (be instanceof LumberjackBlockEntity storage) {
+            ItemStack remainder = storage.insertItem(logItem);
+            if (!remainder.isEmpty()) {
+                Block.popResource(level, lumberjack.blockPosition(), remainder);
+            }
+        } else {
+            Block.popResource(level, lumberjack.blockPosition(), logItem);
         }
     }
 
