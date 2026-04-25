@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PPP",
+    "PAP",
+    "PPP"
+  ],
+  "key": {
+    "P": { "tag": "minecraft:planks" },
+    "A": { "tag": "minecraft:axes" }
+  },
+  "result": {
+    "id": "hardworkers:lumberjack_block",
+    "count": 1
+  }
+}
