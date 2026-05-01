@@ -4,6 +4,7 @@ import com.hardworkers.hardworkers.blockentity.LumberjackBlockEntity;
 import com.hardworkers.hardworkers.entity.LumberjackEntity;
 import com.hardworkers.hardworkers.init.ModBlockEntities;
 import com.hardworkers.hardworkers.init.ModEntities;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Containers;
@@ -24,12 +25,15 @@ import javax.annotation.Nullable;
 
 public class LumberjackBlock extends BaseEntityBlock {
 
-    public LumberjackBlock() {
-        super(BlockBehaviour.Properties.of()
-            .mapColor(MapColor.WOOD)
-            .sound(SoundType.WOOD)
-            .strength(2.0f)
-        );
+    public static final MapCodec<LumberjackBlock> CODEC = simpleCodec(LumberjackBlock::new);
+
+    public LumberjackBlock(BlockBehaviour.Properties properties) {
+        super(properties);
+    }
+
+    @Override
+    public MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     // -------------------------------------------------------------------------

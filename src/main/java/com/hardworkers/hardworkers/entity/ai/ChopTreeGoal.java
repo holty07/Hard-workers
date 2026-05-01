@@ -9,7 +9,6 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelEvent;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -128,7 +127,7 @@ public class ChopTreeGoal extends Goal {
         if (level instanceof ServerLevel serverLevel) {
             List<ItemStack> drops = Block.getDrops(state, serverLevel, logPos, null);
             serverLevel.setBlock(logPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-            serverLevel.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, logPos, Block.getId(state));
+            serverLevel.levelEvent(2001, logPos, Block.getId(state)); // 2001 = block break particles + sound
             depositItems(serverLevel, drops);
         }
     }
@@ -266,7 +265,6 @@ public class ChopTreeGoal extends Goal {
         if (log == Blocks.DARK_OAK_LOG     || log == Blocks.STRIPPED_DARK_OAK_LOG)     return Blocks.DARK_OAK_SAPLING;
         if (log == Blocks.MANGROVE_LOG     || log == Blocks.STRIPPED_MANGROVE_LOG)     return Blocks.MANGROVE_PROPAGULE;
         if (log == Blocks.CHERRY_LOG       || log == Blocks.STRIPPED_CHERRY_LOG)       return Blocks.CHERRY_SAPLING;
-        if (log == Blocks.PALE_OAK_LOG     || log == Blocks.STRIPPED_PALE_OAK_LOG)     return Blocks.PALE_OAK_SAPLING;
         return Blocks.OAK_SAPLING;
     }
 }
