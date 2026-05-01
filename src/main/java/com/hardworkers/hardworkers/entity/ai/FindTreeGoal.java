@@ -9,8 +9,11 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Scans the configurable area around the lumberjack's home block for the base
@@ -66,6 +69,8 @@ public class FindTreeGoal extends Goal {
         BlockPos home = lumberjack.getHomePosition();
         int radius = HardWorkersConfig.LUMBERJACK_SEARCH_RADIUS.get();
 
+        Set<BlockPos> claimed = getClaimedTrees(level, home, radius);
+
         BlockPos nearest = null;
         double nearestDistSq = Double.MAX_VALUE;
 
@@ -73,8 +78,9 @@ public class FindTreeGoal extends Goal {
             for (int z = -radius; z <= radius; z++) {
                 for (int y = -radius / 2; y <= radius / 2; y++) {
                     BlockPos candidate = home.offset(x, y, z);
-                    BlockState state = level.getBlockState(candidate);
+                    if (claimed.contains(candidate)) continue;
 
+                    BlockState state = level.getBlockState(candidate);
                     if (state.is(BlockTags.LOGS) && isBaseLog(level, candidate)) {
                         double distSq = home.distSqr(candidate);
                         if (distSq < nearestDistSq) {
@@ -86,6 +92,18 @@ public class FindTreeGoal extends Goal {
             }
         }
         return nearest;
+    }
+
+    /** Returns the set of tree-base positions already claimed by other lumberjacks in the area. */
+    private Set<BlockPos> getClaimedTrees(Level level, BlockPos home, int radius) {
+        AABB searchBox = new AABB(
+            home.getX() - radius, home.getY() - radius / 2.0, home.getZ() - radius,
+            home.getX() + radius, home.getY() + radius / 2.0, home.getZ() + radius
+        );
+        Set<BlockPos> claimed = new HashSet<>();
+        level.getEntitiesOfClass(LumberjackEntity.class, searchBox, e -> e != lumberjack)
+             .forEach(e -> { if (e.getTargetTree() != null) claimed.add(e.getTargetTree()); });
+        return claimed;
     }
 
     /** A base log is a log block that does not have another log directly below it. */
