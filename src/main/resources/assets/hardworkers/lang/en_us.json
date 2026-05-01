@@ -4,5 +4,12 @@
   "block.hardworkers.lumberjack_iron":      "Lumberjack Block (Iron)",
   "block.hardworkers.lumberjack_diamond":   "Lumberjack Block (Diamond)",
   "block.hardworkers.lumberjack_netherite": "Lumberjack Block (Netherite)",
-  "entity.hardworkers.lumberjack":          "Lumberjack"
+  "entity.hardworkers.lumberjack":          "Lumberjack",
+
+  "block.hardworkers.miner_wood":      "Miner Block (Wood)",
+  "block.hardworkers.miner_stone":     "Miner Block (Stone)",
+  "block.hardworkers.miner_iron":      "Miner Block (Iron)",
+  "block.hardworkers.miner_diamond":   "Miner Block (Diamond)",
+  "block.hardworkers.miner_netherite": "Miner Block (Netherite)",
+  "entity.hardworkers.miner":          "Miner"
 }

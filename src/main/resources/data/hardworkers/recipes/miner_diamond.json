@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [ "WWW", "WAW", "WBW" ],
+  "key": {
+    "W": { "tag": "minecraft:planks" },
+    "A": { "item": "minecraft:diamond_pickaxe" },
+    "B": { "item": "hardworkers:miner_iron" }
+  },
+  "result": { "id": "hardworkers:miner_diamond", "count": 1 }
+}

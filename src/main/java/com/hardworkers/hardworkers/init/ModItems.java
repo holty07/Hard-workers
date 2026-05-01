@@ -14,4 +14,11 @@ public class ModItems {
     public static final DeferredItem<BlockItem> LUMBERJACK_IRON_ITEM      = ITEMS.registerSimpleBlockItem(ModBlocks.LUMBERJACK_IRON);
     public static final DeferredItem<BlockItem> LUMBERJACK_DIAMOND_ITEM   = ITEMS.registerSimpleBlockItem(ModBlocks.LUMBERJACK_DIAMOND);
     public static final DeferredItem<BlockItem> LUMBERJACK_NETHERITE_ITEM = ITEMS.registerSimpleBlockItem(ModBlocks.LUMBERJACK_NETHERITE);
+
+    public static final DeferredItem<BlockItem> MINER_WOOD_ITEM      = ITEMS.registerSimpleBlockItem(ModBlocks.MINER_WOOD);
+    public static final DeferredItem<BlockItem> MINER_STONE_ITEM     = ITEMS.registerSimpleBlockItem(ModBlocks.MINER_STONE);
+    public static final DeferredItem<BlockItem> MINER_IRON_ITEM      = ITEMS.registerSimpleBlockItem(ModBlocks.MINER_IRON);
+    public static final DeferredItem<BlockItem> MINER_DIAMOND_ITEM   = ITEMS.registerSimpleBlockItem(ModBlocks.MINER_DIAMOND);
+    public static final DeferredItem<BlockItem> MINER_NETHERITE_ITEM = ITEMS.registerSimpleBlockItem(ModBlocks.MINER_NETHERITE);
 }
+

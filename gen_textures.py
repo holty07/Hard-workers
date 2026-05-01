@@ -115,6 +115,69 @@ for tier, color in TIERS.items():
         write_png(f"{BLOCK_TEX}/lumberjack_{tier}_{face}.png", 16, 16,
                   block_face(color, face))
 
+# Miner block textures — same colour palette, front shows a pickaxe-hint
+# (two small bright dots for drill bits instead of eyes)
+MINER_TIERS = {
+    "wood":      (120,  85,  40),   # warm brown, darker than lumberjack
+    "stone":     ( 90,  90,  95),   # darker grey
+    "iron":      (155, 160, 175),   # steely blue-grey
+    "diamond":   ( 30, 170, 190),   # deeper cyan
+    "netherite": ( 40,  18,  55),   # deep purple
+}
+
+def miner_face(base, variant):
+    r, g, b = base
+    pix = []
+    for y in range(16):
+        for x in range(16):
+            border = x == 0 or x == 15 or y == 0 or y == 15
+            dark = shade(base, -45)
+            if variant == "front":
+                # Two drill-bit dots + lower vent grill
+                bit_l = (x in (4, 5) and y in (4, 5, 6))
+                bit_r = (x in (10, 11) and y in (4, 5, 6))
+                grill = (4 <= x <= 11 and y in (10, 12) and x % 2 == 0)
+                if border:
+                    pix.append(dark + (255,))
+                elif bit_l or bit_r:
+                    pix.append((210, 210, 255, 255))  # bright tip
+                elif grill:
+                    pix.append(shade(base, -30) + (255,))
+                else:
+                    pix.append((r, g, b, 255))
+            elif variant == "top":
+                cross = (x == 8 or y == 8)
+                if border:
+                    pix.append(shade(base, -20) + (255,))
+                elif cross:
+                    pix.append(shade(base, +55) + (255,))
+                else:
+                    pix.append(shade(base, +30) + (255,))
+            elif variant == "bottom":
+                if border:
+                    pix.append(shade(base, -65) + (255,))
+                else:
+                    pix.append(shade(base, -40) + (255,))
+            elif variant == "back":
+                stripe = ((x + y) % 6 == 0)
+                if border:
+                    pix.append(dark + (255,))
+                elif stripe:
+                    pix.append(shade(base, -25) + (255,))
+                else:
+                    pix.append(shade(base, +10) + (255,))
+            else:  # side
+                if border:
+                    pix.append(dark + (255,))
+                else:
+                    pix.append((r, g, b, 255))
+    return pix
+
+for tier, color in MINER_TIERS.items():
+    for face in ("front", "back", "top", "bottom", "side"):
+        write_png(f"{BLOCK_TEX}/miner_{tier}_{face}.png", 16, 16,
+                  miner_face(color, face))
+
 # ---------------------------------------------------------------------------
 # Entity skin template  (64x64, standard Minecraft player UV layout)
 #
@@ -251,5 +314,107 @@ f(44,60, 4, 4, SKIN2)
 write_png("src/main/resources/assets/hardworkers/textures/entity/lumberjack.png",
           64, 64, pixels)
 
+# ---------------------------------------------------------------------------
+# Miner entity skin  (64x64)
+# Colour scheme: grey hard-hat, brown leather jacket, dark trousers, boots
+# Same UV layout as the lumberjack skin — edit in any pixel editor.
+# ---------------------------------------------------------------------------
+
+MHAT_F = ( 50,  50,  55, 255)   # hard hat front (dark grey)
+MHAT_S = ( 40,  40,  45, 255)   # hard hat sides
+MHAT_T = ( 60,  60,  65, 255)   # hard hat top
+MJACK_F = ( 90,  65,  35, 255)  # leather jacket front (brown)
+MJACK_S = ( 70,  50,  25, 255)  # jacket sides
+MPANTS_F = ( 55,  55,  60, 255) # dark grey trousers
+MPANTS_S = ( 45,  45,  50, 255)
+MBOOT    = ( 35,  25,  15, 255)
+MBOOT2   = ( 25,  18,  10, 255)
+LAMP     = (220, 200,  50, 255)  # lamp dot on hard hat
+
+mp = [TRANS] * (64 * 64)
+
+def mf(x, y, fw, fh, color):
+    fill(mp, 64, x, y, fw, fh, color)
+
+# ── HEAD ────────────────────────────────────────────────────────────────────
+mf( 8, 0, 8, 8, SKIN)
+mf(16, 0, 8, 8, SKIN2)
+mf( 0, 8, 8, 8, SKIN2)
+mf( 8, 8, 8, 8, SKIN)       # face
+mf(16, 8, 8, 8, SKIN2)
+mf(24, 8, 8, 8, SKIN2)
+mf(10,10, 2, 2, EYE)
+mf(13,10, 2, 2, EYE)
+mf( 9,13, 6, 2, BEARD)
+
+# ── HARD HAT (head overlay) ──────────────────────────────────────────────────
+mf(40, 0, 8, 8, MHAT_T)    # top — with lamp dot
+mf(48, 0, 8, 8, MHAT_S)    # bottom inside
+mf(32, 8, 8, 8, MHAT_S)    # right
+mf(40, 8, 8, 8, MHAT_F)    # front
+mf(48, 8, 8, 8, MHAT_S)    # left
+mf(56, 8, 8, 8, MHAT_S)    # back
+# headlamp on hat top (centre-ish)
+mf(43, 2, 2, 2, LAMP)
+
+# ── BODY — leather jacket ────────────────────────────────────────────────────
+mf(20,16, 8, 4, MJACK_S)
+mf(28,16, 8, 4, MJACK_S)
+mf(16,20, 4,12, MJACK_S)
+mf(20,20, 8,12, MJACK_F)
+mf(28,20, 4,12, MJACK_S)
+mf(32,20, 8,12, MJACK_S)
+
+# ── RIGHT LEG ───────────────────────────────────────────────────────────────
+mf( 4,16, 4, 4, MPANTS_S)
+mf( 8,16, 4, 4, MPANTS_S)
+mf( 0,20, 4,12, MPANTS_S)
+mf( 4,20, 4,12, MPANTS_F)
+mf( 8,20, 4,12, MPANTS_S)
+mf(12,20, 4,12, MPANTS_S)
+mf( 0,28, 4, 4, MBOOT2)
+mf( 4,28, 4, 4, MBOOT)
+mf( 8,28, 4, 4, MBOOT2)
+mf(12,28, 4, 4, MBOOT2)
+
+# ── LEFT LEG ────────────────────────────────────────────────────────────────
+mf(20,48, 4, 4, MPANTS_S)
+mf(24,48, 4, 4, MPANTS_S)
+mf(16,52, 4,12, MPANTS_S)
+mf(20,52, 4,12, MPANTS_F)
+mf(24,52, 4,12, MPANTS_S)
+mf(28,52, 4,12, MPANTS_S)
+mf(16,60, 4, 4, MBOOT2)
+mf(20,60, 4, 4, MBOOT)
+mf(24,60, 4, 4, MBOOT2)
+mf(28,60, 4, 4, MBOOT2)
+
+# ── RIGHT ARM ───────────────────────────────────────────────────────────────
+mf(44,16, 4, 4, MJACK_S)
+mf(48,16, 4, 4, MJACK_S)
+mf(40,20, 4,12, MJACK_S)
+mf(44,20, 4,12, MJACK_F)
+mf(48,20, 4,12, MJACK_S)
+mf(52,20, 4,12, MJACK_S)
+mf(40,28, 4, 4, SKIN2)
+mf(44,28, 4, 4, SKIN)
+mf(48,28, 4, 4, SKIN2)
+mf(52,28, 4, 4, SKIN2)
+
+# ── LEFT ARM ────────────────────────────────────────────────────────────────
+mf(36,48, 4, 4, MJACK_S)
+mf(40,48, 4, 4, MJACK_S)
+mf(32,52, 4,12, MJACK_S)
+mf(36,52, 4,12, MJACK_F)
+mf(40,52, 4,12, MJACK_S)
+mf(44,52, 4,12, MJACK_S)
+mf(32,60, 4, 4, SKIN2)
+mf(36,60, 4, 4, SKIN)
+mf(40,60, 4, 4, SKIN2)
+mf(44,60, 4, 4, SKIN2)
+
+write_png("src/main/resources/assets/hardworkers/textures/entity/miner.png",
+          64, 64, mp)
+
 print("\nDone!  Edit the PNGs in any pixel editor (e.g. Aseprite, GIMP, Pixelorama).")
-print("Block textures are 16x16; the entity skin is 64x64 (standard Minecraft layout).")
+print("Block textures are 16x16; entity skins are 64x64 (standard Minecraft layout).")

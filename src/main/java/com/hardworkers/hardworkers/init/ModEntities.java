@@ -2,6 +2,7 @@ package com.hardworkers.hardworkers.init;
 
 import com.hardworkers.hardworkers.HardWorkers;
 import com.hardworkers.hardworkers.entity.LumberjackEntity;
+import com.hardworkers.hardworkers.entity.MinerEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -20,4 +21,13 @@ public class ModEntities {
                 .clientTrackingRange(10)
                 .build("lumberjack")
         );
+
+    public static final DeferredHolder<EntityType<?>, EntityType<MinerEntity>> MINER =
+        ENTITY_TYPES.register("miner", () ->
+            EntityType.Builder.<MinerEntity>of(MinerEntity::new, MobCategory.MISC)
+                .sized(0.6f, 1.95f)
+                .clientTrackingRange(80)
+                .build("miner")
+        );
 }
+

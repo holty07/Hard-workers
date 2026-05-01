@@ -2,6 +2,7 @@ package com.hardworkers.hardworkers.init;
 
 import com.hardworkers.hardworkers.HardWorkers;
 import com.hardworkers.hardworkers.blockentity.LumberjackBlockEntity;
+import com.hardworkers.hardworkers.blockentity.MinerBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -23,4 +24,17 @@ public class ModBlockEntities {
                 ModBlocks.LUMBERJACK_NETHERITE.get()
             ).build(null)
         );
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<MinerBlockEntity>> MINER_BLOCK_ENTITY =
+        BLOCK_ENTITY_TYPES.register("miner_block", () ->
+            BlockEntityType.Builder.of(
+                MinerBlockEntity::new,
+                ModBlocks.MINER_WOOD.get(),
+                ModBlocks.MINER_STONE.get(),
+                ModBlocks.MINER_IRON.get(),
+                ModBlocks.MINER_DIAMOND.get(),
+                ModBlocks.MINER_NETHERITE.get()
+            ).build(null)
+        );
 }
+
