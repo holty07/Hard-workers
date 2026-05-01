@@ -41,6 +41,19 @@ repositories {
     mavenLocal()
 }
 
+// NeoForge 21.1.x puts ASM 9.7 on the JVM module path. The NeoGradle plugin
+// pulls in a transitive ASM 9.5 which then also lands on the classpath,
+// causing BootstrapLauncher to refuse to start. Force everything to 9.7.
+configurations.all {
+    resolutionStrategy {
+        force 'org.ow2.asm:asm:9.7'
+        force 'org.ow2.asm:asm-analysis:9.7'
+        force 'org.ow2.asm:asm-commons:9.7'
+        force 'org.ow2.asm:asm-tree:9.7'
+        force 'org.ow2.asm:asm-util:9.7'
+    }
+}
+
 dependencies {
     implementation "net.neoforged:neoforge:${project.neo_version}"
 }
