@@ -12,7 +12,6 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
 
 @EventBusSubscriber(modid = HardWorkers.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class ModEventSubscriber {
@@ -25,14 +24,14 @@ public class ModEventSubscriber {
     @SubscribeEvent
     public static void onBuildCreativeTab(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
-            event.accept(ModItems.LUMBERJACK_BLOCK_ITEM);
+            event.accept(ModItems.LUMBERJACK_WOOD_ITEM);
+            event.accept(ModItems.LUMBERJACK_STONE_ITEM);
+            event.accept(ModItems.LUMBERJACK_IRON_ITEM);
+            event.accept(ModItems.LUMBERJACK_DIAMOND_ITEM);
+            event.accept(ModItems.LUMBERJACK_NETHERITE_ITEM);
         }
     }
 
-    /**
-     * Exposes the block entity's inventory as IItemHandler so that hoppers and
-     * pipes from other mods (e.g. Mekanism, Pipez) can extract logs from it.
-     */
     @SubscribeEvent
     public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(

@@ -1,4 +1,8 @@
 {
-  "block.hardworkers.lumberjack_block": "Lumberjack Block",
-  "entity.hardworkers.lumberjack": "Lumberjack"
+  "block.hardworkers.lumberjack_wood":      "Lumberjack Block (Wood)",
+  "block.hardworkers.lumberjack_stone":     "Lumberjack Block (Stone)",
+  "block.hardworkers.lumberjack_iron":      "Lumberjack Block (Iron)",
+  "block.hardworkers.lumberjack_diamond":   "Lumberjack Block (Diamond)",
+  "block.hardworkers.lumberjack_netherite": "Lumberjack Block (Netherite)",
+  "entity.hardworkers.lumberjack":          "Lumberjack"
 }

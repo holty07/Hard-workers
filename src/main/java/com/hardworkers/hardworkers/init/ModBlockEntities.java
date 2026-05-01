@@ -14,7 +14,13 @@ public class ModBlockEntities {
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<LumberjackBlockEntity>> LUMBERJACK_BLOCK_ENTITY =
         BLOCK_ENTITY_TYPES.register("lumberjack_block", () ->
-            BlockEntityType.Builder.of(LumberjackBlockEntity::new, ModBlocks.LUMBERJACK_BLOCK.get())
-                .build(null)
+            BlockEntityType.Builder.of(
+                LumberjackBlockEntity::new,
+                ModBlocks.LUMBERJACK_WOOD.get(),
+                ModBlocks.LUMBERJACK_STONE.get(),
+                ModBlocks.LUMBERJACK_IRON.get(),
+                ModBlocks.LUMBERJACK_DIAMOND.get(),
+                ModBlocks.LUMBERJACK_NETHERITE.get()
+            ).build(null)
         );
 }

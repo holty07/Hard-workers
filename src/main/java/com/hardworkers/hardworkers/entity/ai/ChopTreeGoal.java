@@ -1,6 +1,6 @@
 package com.hardworkers.hardworkers.entity.ai;
 
-import com.hardworkers.hardworkers.HardWorkersConfig;
+import com.hardworkers.hardworkers.block.LumberjackBlock;
 import com.hardworkers.hardworkers.blockentity.LumberjackBlockEntity;
 import com.hardworkers.hardworkers.entity.LumberjackEntity;
 import net.minecraft.core.BlockPos;
@@ -81,7 +81,7 @@ public class ChopTreeGoal extends Goal {
         }
 
         chopTimer++;
-        if (chopTimer >= HardWorkersConfig.LUMBERJACK_CHOP_INTERVAL.get()) {
+        if (chopTimer >= chopInterval()) {
             chopTimer = 0;
             chopNext();
         }
@@ -104,6 +104,15 @@ public class ChopTreeGoal extends Goal {
     }
 
     // -------------------------------------------------------------------------
+
+    /** Returns the chop interval from the home block's tier, with a safe fallback. */
+    private int chopInterval() {
+        BlockState home = lumberjack.level().getBlockState(lumberjack.getHomePosition());
+        if (home.getBlock() instanceof LumberjackBlock lb) {
+            return lb.getTier().chopInterval;
+        }
+        return 20;
+    }
 
     private void navigateTo(BlockPos pos) {
         lumberjack.getNavigation().moveTo(

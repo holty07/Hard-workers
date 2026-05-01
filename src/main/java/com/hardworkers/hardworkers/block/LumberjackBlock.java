@@ -2,7 +2,6 @@ package com.hardworkers.hardworkers.block;
 
 import com.hardworkers.hardworkers.blockentity.LumberjackBlockEntity;
 import com.hardworkers.hardworkers.entity.LumberjackEntity;
-import com.hardworkers.hardworkers.init.ModBlockEntities;
 import com.hardworkers.hardworkers.init.ModEntities;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -25,15 +24,34 @@ import javax.annotation.Nullable;
 
 public class LumberjackBlock extends BaseEntityBlock {
 
-    public static final MapCodec<LumberjackBlock> CODEC = simpleCodec(LumberjackBlock::new);
+    // One codec per tier — simpleCodec only encodes Properties, so we capture
+    // the tier via a lambda for each variant.
+    public static final MapCodec<LumberjackBlock> WOOD_CODEC      = simpleCodec(p -> new LumberjackBlock(LumberjackTier.WOOD, p));
+    public static final MapCodec<LumberjackBlock> STONE_CODEC     = simpleCodec(p -> new LumberjackBlock(LumberjackTier.STONE, p));
+    public static final MapCodec<LumberjackBlock> IRON_CODEC      = simpleCodec(p -> new LumberjackBlock(LumberjackTier.IRON, p));
+    public static final MapCodec<LumberjackBlock> DIAMOND_CODEC   = simpleCodec(p -> new LumberjackBlock(LumberjackTier.DIAMOND, p));
+    public static final MapCodec<LumberjackBlock> NETHERITE_CODEC = simpleCodec(p -> new LumberjackBlock(LumberjackTier.NETHERITE, p));
 
-    public LumberjackBlock(BlockBehaviour.Properties properties) {
+    private final LumberjackTier tier;
+
+    public LumberjackBlock(LumberjackTier tier, BlockBehaviour.Properties properties) {
         super(properties);
+        this.tier = tier;
+    }
+
+    public LumberjackTier getTier() {
+        return tier;
     }
 
     @Override
     public MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
+        return switch (tier) {
+            case WOOD      -> WOOD_CODEC;
+            case STONE     -> STONE_CODEC;
+            case IRON      -> IRON_CODEC;
+            case DIAMOND   -> DIAMOND_CODEC;
+            case NETHERITE -> NETHERITE_CODEC;
+        };
     }
 
     // -------------------------------------------------------------------------
@@ -46,7 +64,6 @@ public class LumberjackBlock extends BaseEntityBlock {
         return new LumberjackBlockEntity(pos, state);
     }
 
-    // Keep the normal cube model; BaseEntityBlock defaults to INVISIBLE.
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
@@ -72,11 +89,9 @@ public class LumberjackBlock extends BaseEntityBlock {
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!level.isClientSide() && !state.is(newState.getBlock())) {
-            // Drop stored logs
             if (level.getBlockEntity(pos) instanceof LumberjackBlockEntity be) {
                 Containers.dropContents(level, pos, be);
             }
-            // Discard the associated lumberjack entity
             AABB searchArea = new AABB(pos).inflate(3.0);
             level.getEntitiesOfClass(LumberjackEntity.class, searchArea)
                 .stream()
@@ -87,7 +102,7 @@ public class LumberjackBlock extends BaseEntityBlock {
     }
 
     // -------------------------------------------------------------------------
-    // Interaction — right-click shows storage status in the action bar
+    // Interaction
     // -------------------------------------------------------------------------
 
     @Override
@@ -97,5 +112,16 @@ public class LumberjackBlock extends BaseEntityBlock {
             player.displayClientMessage(be.getStorageStatus(), true);
         }
         return InteractionResult.sidedSuccess(level.isClientSide());
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    public static BlockBehaviour.Properties baseProperties(MapColor color) {
+        return BlockBehaviour.Properties.of()
+            .mapColor(color)
+            .sound(SoundType.WOOD)
+            .strength(2.0f);
     }
 }

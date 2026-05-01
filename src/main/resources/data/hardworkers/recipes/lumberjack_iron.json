@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [ "WWW", "WAW", "WBW" ],
+  "key": {
+    "W": { "tag": "minecraft:planks" },
+    "A": { "item": "minecraft:iron_axe" },
+    "B": { "item": "hardworkers:lumberjack_stone" }
+  },
+  "result": { "id": "hardworkers:lumberjack_iron", "count": 1 }
+}
