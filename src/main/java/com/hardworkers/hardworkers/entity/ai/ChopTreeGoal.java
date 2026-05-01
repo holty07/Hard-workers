@@ -18,18 +18,23 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.*;
 
 /**
- * Navigates to the tree set by FindTreeGoal, breaks every connected log
- * (BFS-collected, chopped bottom-to-top) at the configured interval, then
- * plants the matching sapling at the base position.
+ * Navigates to the tree set by FindTreeGoal, breaks every connected log at the
+ * configured interval, then instantly clears all associated leaves (collecting
+ * their drops — saplings, apples, sticks), and finally plants a sapling.
+ *
+ * All drops go into the LumberjackBlockEntity; overflow lands on the ground.
  */
 public class ChopTreeGoal extends Goal {
 
     private static final double REACH_DIST_SQ = 16.0; // 4-block reach
     private static final int MAX_LOGS = 256;
+    /** Margin around the log bounding box to scan for leaf blocks. */
+    private static final int LEAF_MARGIN = 3;
 
     private final LumberjackEntity lumberjack;
     private int chopTimer = 0;
     private final List<BlockPos> logsToChop = new ArrayList<>();
+    private final List<BlockPos> leavesToClear = new ArrayList<>();
     private Block saplingType = null;
     private BlockPos plantPos = null;
 
@@ -58,7 +63,7 @@ public class ChopTreeGoal extends Goal {
         saplingType = saplingFor(level.getBlockState(treeBase).getBlock());
         plantPos = treeBase;
 
-        collectTreeLogs(level, treeBase);
+        collectTreeBlocks(level, treeBase);
         navigateTo(treeBase);
     }
 
@@ -83,15 +88,16 @@ public class ChopTreeGoal extends Goal {
         }
 
         if (logsToChop.isEmpty()) {
+            clearLeaves();
             plantSapling();
             lumberjack.setTargetTree(null);
-            // canContinueToUse() will return false next tick, triggering stop()
         }
     }
 
     @Override
     public void stop() {
         logsToChop.clear();
+        leavesToClear.clear();
         saplingType = null;
         plantPos = null;
         chopTimer = 0;
@@ -113,17 +119,34 @@ public class ChopTreeGoal extends Goal {
         BlockPos logPos = logsToChop.remove(0);
         BlockState state = level.getBlockState(logPos);
 
-        if (!state.is(BlockTags.LOGS)) return; // already broken by something else
+        if (!state.is(BlockTags.LOGS)) return;
 
         lumberjack.getLookControl().setLookAt(
             logPos.getX() + 0.5, logPos.getY() + 0.5, logPos.getZ() + 0.5
         );
 
         if (level instanceof ServerLevel serverLevel) {
-            level.setBlock(logPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-            level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, logPos, Block.getId(state));
-            depositLog(serverLevel, new ItemStack(state.getBlock().asItem(), 1));
+            List<ItemStack> drops = Block.getDrops(state, serverLevel, logPos, null);
+            serverLevel.setBlock(logPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+            serverLevel.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, logPos, Block.getId(state));
+            depositItems(serverLevel, drops);
         }
+    }
+
+    /** Instantly removes all leaf blocks that were part of this tree, collecting their drops. */
+    private void clearLeaves() {
+        Level level = lumberjack.level();
+        if (!(level instanceof ServerLevel serverLevel)) return;
+
+        for (BlockPos leafPos : leavesToClear) {
+            BlockState leafState = serverLevel.getBlockState(leafPos);
+            if (!leafState.is(BlockTags.LEAVES)) continue; // may have already decayed
+
+            List<ItemStack> drops = Block.getDrops(leafState, serverLevel, leafPos, null);
+            serverLevel.setBlock(leafPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+            depositItems(serverLevel, drops);
+        }
+        leavesToClear.clear();
     }
 
     private void plantSapling() {
@@ -140,24 +163,38 @@ public class ChopTreeGoal extends Goal {
     }
 
     /**
-     * Sends the harvested log to the block entity's storage.
-     * Falls back to dropping the item on the ground if the storage is full or missing.
+     * Sends all {@code drops} to the block entity's storage.
+     * Items that don't fit are popped as entities near the lumberjack.
      */
-    private void depositLog(ServerLevel level, ItemStack logItem) {
+    private void depositItems(ServerLevel level, List<ItemStack> drops) {
         BlockEntity be = level.getBlockEntity(lumberjack.getHomePosition());
         if (be instanceof LumberjackBlockEntity storage) {
-            ItemStack remainder = storage.insertItem(logItem);
-            if (!remainder.isEmpty()) {
-                Block.popResource(level, lumberjack.blockPosition(), remainder);
+            for (ItemStack drop : drops) {
+                ItemStack remainder = storage.insertItem(drop);
+                if (!remainder.isEmpty()) {
+                    Block.popResource(level, lumberjack.blockPosition(), remainder);
+                }
             }
         } else {
-            Block.popResource(level, lumberjack.blockPosition(), logItem);
+            for (ItemStack drop : drops) {
+                Block.popResource(level, lumberjack.blockPosition(), drop);
+            }
         }
     }
 
-    /** BFS from the base log to collect all connected log blocks. */
-    private void collectTreeLogs(Level level, BlockPos base) {
+    // -------------------------------------------------------------------------
+    // Tree scanning
+    // -------------------------------------------------------------------------
+
+    /**
+     * BFS from {@code base} to collect all connected log blocks into
+     * {@link #logsToChop}, then scans the log bounding box for associated
+     * leaf blocks into {@link #leavesToClear}.
+     */
+    private void collectTreeBlocks(Level level, BlockPos base) {
         logsToChop.clear();
+        leavesToClear.clear();
+
         Set<BlockPos> visited = new HashSet<>();
         Queue<BlockPos> queue = new ArrayDeque<>();
         queue.add(base);
@@ -169,7 +206,6 @@ public class ChopTreeGoal extends Goal {
 
             logsToChop.add(current);
 
-            // Logs connect upward, diagonally-up, and horizontally (for large oak etc.)
             BlockPos[] neighbours = {
                 current.above(),
                 current.north(), current.south(), current.east(), current.west(),
@@ -186,8 +222,39 @@ public class ChopTreeGoal extends Goal {
             }
         }
 
-        // Bottom logs first so the tree "falls" from the base
         logsToChop.sort(Comparator.comparingInt(BlockPos::getY));
+        collectLeafBlocks(level);
+    }
+
+    /**
+     * Scans a box around the collected logs (+ {@link #LEAF_MARGIN}) for
+     * leaf blocks and populates {@link #leavesToClear}.
+     */
+    private void collectLeafBlocks(Level level) {
+        if (logsToChop.isEmpty()) return;
+
+        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
+        for (BlockPos p : logsToChop) {
+            if (p.getX() < minX) minX = p.getX();
+            if (p.getY() < minY) minY = p.getY();
+            if (p.getZ() < minZ) minZ = p.getZ();
+            if (p.getX() > maxX) maxX = p.getX();
+            if (p.getY() > maxY) maxY = p.getY();
+            if (p.getZ() > maxZ) maxZ = p.getZ();
+        }
+
+        Set<BlockPos> logSet = new HashSet<>(logsToChop);
+        for (int x = minX - LEAF_MARGIN; x <= maxX + LEAF_MARGIN; x++) {
+            for (int y = minY - 1; y <= maxY + LEAF_MARGIN; y++) {
+                for (int z = minZ - LEAF_MARGIN; z <= maxZ + LEAF_MARGIN; z++) {
+                    BlockPos p = new BlockPos(x, y, z);
+                    if (!logSet.contains(p) && level.getBlockState(p).is(BlockTags.LEAVES)) {
+                        leavesToClear.add(p);
+                    }
+                }
+            }
+        }
     }
 
     private Block saplingFor(Block log) {

@@ -3,6 +3,7 @@ package com.hardworkers.hardworkers.blockentity;
 import com.hardworkers.hardworkers.init.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
@@ -14,20 +15,19 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
 
-import java.util.function.Supplier;
-
 /**
- * Single-slot (max 64 items) storage for logs harvested by the lumberjack.
+ * Chest-sized (27-slot) storage for everything the lumberjack harvests:
+ * logs, saplings, apples, sticks, etc.
+ * <p>
  * Implements {@link Container} for vanilla hopper compatibility.
- * Exposes {@link IItemHandler} via capability for other mods' pipes.
+ * Exposes {@link IItemHandler} via capability for mod pipes.
  */
 public class LumberjackBlockEntity extends BlockEntity implements Container {
 
-    public static final int CAPACITY = 64;
+    public static final int SLOT_COUNT = 27;
 
-    private ItemStack stored = ItemStack.EMPTY;
+    private NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
 
-    // Cached wrapper — created once per block entity instance.
     private final IItemHandler itemHandler = new InvWrapper(this);
 
     public LumberjackBlockEntity(BlockPos pos, BlockState state) {
@@ -43,45 +43,66 @@ public class LumberjackBlockEntity extends BlockEntity implements Container {
     }
 
     /**
-     * Tries to insert {@code incoming} into the slot.
+     * Inserts {@code incoming} into the best available slot.
+     * Merges with existing stacks of the same item first, then fills empty slots.
      *
-     * @return the leftover stack (empty if everything was accepted).
+     * @return the leftover that could not be stored (empty if fully accepted).
      */
     public ItemStack insertItem(ItemStack incoming) {
         if (incoming.isEmpty()) return ItemStack.EMPTY;
 
-        if (stored.isEmpty()) {
-            int accept = Math.min(incoming.getCount(), CAPACITY);
-            stored = incoming.copyWithCount(accept);
-            setChanged();
-            int leftover = incoming.getCount() - accept;
-            return leftover > 0 ? incoming.copyWithCount(leftover) : ItemStack.EMPTY;
+        // Pass 1 — merge into existing matching stacks
+        for (int i = 0; i < SLOT_COUNT; i++) {
+            ItemStack slot = items.get(i);
+            if (!slot.isEmpty()
+                && slot.getItem() == incoming.getItem()
+                && ItemStack.isSameItemSameComponents(slot, incoming)) {
+                int space = slot.getMaxStackSize() - slot.getCount();
+                if (space > 0) {
+                    int toAdd = Math.min(space, incoming.getCount());
+                    slot.grow(toAdd);
+                    setChanged();
+                    incoming = incoming.copyWithCount(incoming.getCount() - toAdd);
+                    if (incoming.isEmpty()) return ItemStack.EMPTY;
+                }
+            }
         }
 
-        if (stored.getItem() == incoming.getItem()) {
-            int space = CAPACITY - stored.getCount();
-            if (space > 0) {
-                int accept = Math.min(space, incoming.getCount());
-                stored.grow(accept);
+        // Pass 2 — fill the first empty slot
+        for (int i = 0; i < SLOT_COUNT; i++) {
+            if (items.get(i).isEmpty()) {
+                int toStore = Math.min(incoming.getCount(), incoming.getMaxStackSize());
+                items.set(i, incoming.copyWithCount(toStore));
                 setChanged();
-                int leftover = incoming.getCount() - accept;
+                int leftover = incoming.getCount() - toStore;
                 return leftover > 0 ? incoming.copyWithCount(leftover) : ItemStack.EMPTY;
             }
         }
 
-        return incoming; // full or different item type
+        return incoming; // no space
     }
 
+    /** Returns true when every slot is occupied with a full stack. */
     public boolean isFull() {
-        return !stored.isEmpty() && stored.getCount() >= CAPACITY;
+        for (ItemStack stack : items) {
+            if (stack.isEmpty() || stack.getCount() < stack.getMaxStackSize()) return false;
+        }
+        return true;
     }
 
     public Component getStorageStatus() {
-        if (stored.isEmpty()) {
-            return Component.literal("Storage: empty");
+        int usedSlots = 0;
+        int totalItems = 0;
+        for (ItemStack stack : items) {
+            if (!stack.isEmpty()) {
+                usedSlots++;
+                totalItems += stack.getCount();
+            }
         }
-        return Component.literal("Storage: " + stored.getCount() + "/" + CAPACITY
-            + " " + stored.getHoverName().getString());
+        if (usedSlots == 0) return Component.literal("Storage: empty");
+        return Component.literal(
+            "Storage: " + usedSlots + "/" + SLOT_COUNT + " slots  (" + totalItems + " items)"
+        );
     }
 
     // -------------------------------------------------------------------------
@@ -90,48 +111,40 @@ public class LumberjackBlockEntity extends BlockEntity implements Container {
 
     @Override
     public int getContainerSize() {
-        return 1;
+        return SLOT_COUNT;
     }
 
     @Override
     public boolean isEmpty() {
-        return stored.isEmpty();
+        for (ItemStack stack : items) {
+            if (!stack.isEmpty()) return false;
+        }
+        return true;
     }
 
     @Override
     public ItemStack getItem(int slot) {
-        return slot == 0 ? stored : ItemStack.EMPTY;
+        return slot >= 0 && slot < SLOT_COUNT ? items.get(slot) : ItemStack.EMPTY;
     }
 
     @Override
     public ItemStack removeItem(int slot, int amount) {
-        if (slot != 0 || stored.isEmpty()) return ItemStack.EMPTY;
-        ItemStack taken = stored.split(amount);
-        setChanged();
-        return taken;
+        ItemStack result = ContainerHelper.removeItem(items, slot, amount);
+        if (!result.isEmpty()) setChanged();
+        return result;
     }
 
     @Override
     public ItemStack removeItemNoUpdate(int slot) {
-        if (slot != 0) return ItemStack.EMPTY;
-        ItemStack was = stored;
-        stored = ItemStack.EMPTY;
-        return was;
+        return ContainerHelper.takeItem(items, slot);
     }
 
     @Override
     public void setItem(int slot, ItemStack stack) {
-        if (slot != 0) return;
-        if (!stack.isEmpty() && stack.getCount() > CAPACITY) {
-            stack = stack.copyWithCount(CAPACITY);
+        if (slot >= 0 && slot < SLOT_COUNT) {
+            items.set(slot, stack);
+            setChanged();
         }
-        stored = stack;
-        setChanged();
-    }
-
-    @Override
-    public int getMaxStackSize() {
-        return CAPACITY;
     }
 
     @Override
@@ -141,7 +154,7 @@ public class LumberjackBlockEntity extends BlockEntity implements Container {
 
     @Override
     public void clearContent() {
-        stored = ItemStack.EMPTY;
+        items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
         setChanged();
     }
 
@@ -152,18 +165,13 @@ public class LumberjackBlockEntity extends BlockEntity implements Container {
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        if (!stored.isEmpty()) {
-            tag.put("Stored", stored.save(registries));
-        }
+        ContainerHelper.saveAllItems(tag, items, registries);
     }
 
     @Override
     public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        if (tag.contains("Stored")) {
-            stored = ItemStack.parseOptional(registries, tag.getCompound("Stored"));
-        } else {
-            stored = ItemStack.EMPTY;
-        }
+        items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
+        ContainerHelper.loadAllItems(tag, items, registries);
     }
 }
