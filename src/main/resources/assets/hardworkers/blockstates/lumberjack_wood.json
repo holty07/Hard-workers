@@ -1,5 +1,8 @@
 {
   "variants": {
-    "": { "model": "hardworkers:block/lumberjack_wood" }
+    "facing=north": { "model": "hardworkers:block/lumberjack_wood" },
+    "facing=east":  { "model": "hardworkers:block/lumberjack_wood", "y": 90 },
+    "facing=south": { "model": "hardworkers:block/lumberjack_wood", "y": 180 },
+    "facing=west":  { "model": "hardworkers:block/lumberjack_wood", "y": 270 }
   }
 }

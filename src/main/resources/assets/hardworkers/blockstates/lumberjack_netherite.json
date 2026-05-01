@@ -1,5 +1,8 @@
 {
   "variants": {
-    "": { "model": "hardworkers:block/lumberjack_netherite" }
+    "facing=north": { "model": "hardworkers:block/lumberjack_netherite" },
+    "facing=east":  { "model": "hardworkers:block/lumberjack_netherite", "y": 90 },
+    "facing=south": { "model": "hardworkers:block/lumberjack_netherite", "y": 180 },
+    "facing=west":  { "model": "hardworkers:block/lumberjack_netherite", "y": 270 }
   }
 }

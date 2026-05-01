@@ -1,4 +1,12 @@
 {
-  "parent": "minecraft:block/cube_all",
-  "textures": { "all": "hardworkers:block/lumberjack_netherite" }
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "hardworkers:block/lumberjack_netherite_front",
+    "up":    "hardworkers:block/lumberjack_netherite_top",
+    "down":  "hardworkers:block/lumberjack_netherite_bottom",
+    "north": "hardworkers:block/lumberjack_netherite_front",
+    "south": "hardworkers:block/lumberjack_netherite_back",
+    "east":  "hardworkers:block/lumberjack_netherite_side",
+    "west":  "hardworkers:block/lumberjack_netherite_side"
+  }
 }
