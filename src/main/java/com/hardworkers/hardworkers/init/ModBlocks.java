@@ -1,6 +1,8 @@
 package com.hardworkers.hardworkers.init;
 
 import com.hardworkers.hardworkers.HardWorkers;
+import com.hardworkers.hardworkers.block.FarmerBlock;
+import com.hardworkers.hardworkers.block.FarmerTier;
 import com.hardworkers.hardworkers.block.LumberjackBlock;
 import com.hardworkers.hardworkers.block.LumberjackTier;
 import com.hardworkers.hardworkers.block.MinerBlock;
@@ -52,5 +54,25 @@ public class ModBlocks {
     public static final DeferredBlock<MinerBlock> MINER_NETHERITE =
         BLOCKS.register("miner_netherite",
             () -> new MinerBlock(MinerTier.NETHERITE, MinerBlock.baseProperties(MapColor.COLOR_BLACK)));
+
+    public static final DeferredBlock<FarmerBlock> FARMER_WOOD =
+        BLOCKS.register("farmer_wood",
+            () -> new FarmerBlock(FarmerTier.WOOD, FarmerBlock.baseProperties(MapColor.PLANT)));
+
+    public static final DeferredBlock<FarmerBlock> FARMER_STONE =
+        BLOCKS.register("farmer_stone",
+            () -> new FarmerBlock(FarmerTier.STONE, FarmerBlock.baseProperties(MapColor.STONE)));
+
+    public static final DeferredBlock<FarmerBlock> FARMER_IRON =
+        BLOCKS.register("farmer_iron",
+            () -> new FarmerBlock(FarmerTier.IRON, FarmerBlock.baseProperties(MapColor.METAL)));
+
+    public static final DeferredBlock<FarmerBlock> FARMER_DIAMOND =
+        BLOCKS.register("farmer_diamond",
+            () -> new FarmerBlock(FarmerTier.DIAMOND, FarmerBlock.baseProperties(MapColor.DIAMOND)));
+
+    public static final DeferredBlock<FarmerBlock> FARMER_NETHERITE =
+        BLOCKS.register("farmer_netherite",
+            () -> new FarmerBlock(FarmerTier.NETHERITE, FarmerBlock.baseProperties(MapColor.COLOR_BLACK)));
 }
 

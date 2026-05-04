@@ -11,5 +11,12 @@
   "block.hardworkers.miner_iron":      "Miner Block (Iron)",
   "block.hardworkers.miner_diamond":   "Miner Block (Diamond)",
   "block.hardworkers.miner_netherite": "Miner Block (Netherite)",
-  "entity.hardworkers.miner":          "Miner"
+  "entity.hardworkers.miner":          "Miner",
+
+  "block.hardworkers.farmer_wood":      "Farmer Block (Wood)",
+  "block.hardworkers.farmer_stone":     "Farmer Block (Stone)",
+  "block.hardworkers.farmer_iron":      "Farmer Block (Iron)",
+  "block.hardworkers.farmer_diamond":   "Farmer Block (Diamond)",
+  "block.hardworkers.farmer_netherite": "Farmer Block (Netherite)",
+  "entity.hardworkers.farmer":          "Farmer"
 }

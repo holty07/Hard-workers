@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "hardworkers:block/farmer_netherite" },
+    "facing=east":  { "model": "hardworkers:block/farmer_netherite", "y": 90 },
+    "facing=south": { "model": "hardworkers:block/farmer_netherite", "y": 180 },
+    "facing=west":  { "model": "hardworkers:block/farmer_netherite", "y": 270 }
+  }
+}

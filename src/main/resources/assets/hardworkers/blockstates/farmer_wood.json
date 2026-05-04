@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "hardworkers:block/farmer_wood" },
+    "facing=east":  { "model": "hardworkers:block/farmer_wood", "y": 90 },
+    "facing=south": { "model": "hardworkers:block/farmer_wood", "y": 180 },
+    "facing=west":  { "model": "hardworkers:block/farmer_wood", "y": 270 }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:block",
+  "pools": [{
+    "rolls": 1,
+    "entries": [{ "type": "minecraft:item", "name": "hardworkers:farmer_netherite" }],
+    "conditions": [{ "condition": "minecraft:survives_explosion" }]
+  }]
+}

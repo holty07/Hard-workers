@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [ "WWW", "WAW", "WBW" ],
+  "key": {
+    "W": { "tag": "minecraft:planks" },
+    "A": { "item": "minecraft:diamond_hoe" },
+    "B": { "item": "hardworkers:farmer_iron" }
+  },
+  "result": { "id": "hardworkers:farmer_diamond", "count": 1 }
+}

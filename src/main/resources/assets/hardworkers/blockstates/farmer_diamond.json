@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "hardworkers:block/farmer_diamond" },
+    "facing=east":  { "model": "hardworkers:block/farmer_diamond", "y": 90 },
+    "facing=south": { "model": "hardworkers:block/farmer_diamond", "y": 180 },
+    "facing=west":  { "model": "hardworkers:block/farmer_diamond", "y": 270 }
+  }
+}

@@ -1,6 +1,7 @@
 package com.hardworkers.hardworkers.client;
 
 import com.hardworkers.hardworkers.HardWorkers;
+import com.hardworkers.hardworkers.entity.client.FarmerRenderer;
 import com.hardworkers.hardworkers.entity.client.LumberjackRenderer;
 import com.hardworkers.hardworkers.entity.client.MinerRenderer;
 import com.hardworkers.hardworkers.init.ModEntities;
@@ -16,5 +17,6 @@ public class ClientEvents {
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.LUMBERJACK.get(), LumberjackRenderer::new);
         event.registerEntityRenderer(ModEntities.MINER.get(), MinerRenderer::new);
+        event.registerEntityRenderer(ModEntities.FARMER.get(), FarmerRenderer::new);
     }
 }

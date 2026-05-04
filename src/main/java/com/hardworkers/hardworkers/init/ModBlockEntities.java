@@ -1,6 +1,7 @@
 package com.hardworkers.hardworkers.init;
 
 import com.hardworkers.hardworkers.HardWorkers;
+import com.hardworkers.hardworkers.blockentity.FarmerBlockEntity;
 import com.hardworkers.hardworkers.blockentity.LumberjackBlockEntity;
 import com.hardworkers.hardworkers.blockentity.MinerBlockEntity;
 import net.minecraft.core.registries.Registries;
@@ -34,6 +35,18 @@ public class ModBlockEntities {
                 ModBlocks.MINER_IRON.get(),
                 ModBlocks.MINER_DIAMOND.get(),
                 ModBlocks.MINER_NETHERITE.get()
+            ).build(null)
+        );
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FarmerBlockEntity>> FARMER_BLOCK_ENTITY =
+        BLOCK_ENTITY_TYPES.register("farmer_block", () ->
+            BlockEntityType.Builder.of(
+                FarmerBlockEntity::new,
+                ModBlocks.FARMER_WOOD.get(),
+                ModBlocks.FARMER_STONE.get(),
+                ModBlocks.FARMER_IRON.get(),
+                ModBlocks.FARMER_DIAMOND.get(),
+                ModBlocks.FARMER_NETHERITE.get()
             ).build(null)
         );
 }

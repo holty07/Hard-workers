@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [ "WWW", "WAW", "WBW" ],
+  "key": {
+    "W": { "tag": "minecraft:planks" },
+    "A": { "item": "minecraft:iron_hoe" },
+    "B": { "item": "hardworkers:farmer_stone" }
+  },
+  "result": { "id": "hardworkers:farmer_iron", "count": 1 }
+}

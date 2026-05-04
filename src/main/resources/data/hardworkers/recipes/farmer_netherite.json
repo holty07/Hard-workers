@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [ "WWW", "WAW", "WBW" ],
+  "key": {
+    "W": { "tag": "minecraft:planks" },
+    "A": { "item": "minecraft:netherite_hoe" },
+    "B": { "item": "hardworkers:farmer_diamond" }
+  },
+  "result": { "id": "hardworkers:farmer_netherite", "count": 1 }
+}

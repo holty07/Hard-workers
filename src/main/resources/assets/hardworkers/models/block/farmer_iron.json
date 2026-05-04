@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "hardworkers:block/farmer_iron_front",
+    "up":    "hardworkers:block/farmer_iron_top",
+    "down":  "hardworkers:block/farmer_iron_bottom",
+    "north": "hardworkers:block/farmer_iron_front",
+    "south": "hardworkers:block/farmer_iron_back",
+    "east":  "hardworkers:block/farmer_iron_side",
+    "west":  "hardworkers:block/farmer_iron_side"
+  }
+}
