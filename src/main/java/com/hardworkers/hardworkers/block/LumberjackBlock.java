@@ -110,6 +110,7 @@ public class LumberjackBlock extends BaseEntityBlock {
             LumberjackEntity lumberjack = ModEntities.LUMBERJACK.get().create(level);
             if (lumberjack != null) {
                 lumberjack.setHomePosition(pos);
+                lumberjack.setTierEquipment(this.tier);
                 lumberjack.moveTo(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 0f, 0f);
                 level.addFreshEntity(lumberjack);
             }

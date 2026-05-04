@@ -1,15 +1,19 @@
 package com.hardworkers.hardworkers.entity;
 
+import com.hardworkers.hardworkers.block.MinerTier;
 import com.hardworkers.hardworkers.entity.ai.MineForwardGoal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 
 public class MinerEntity extends PathfinderMob {
@@ -71,4 +75,15 @@ public class MinerEntity extends PathfinderMob {
 
     public int getCurrentDepth() { return currentDepth; }
     public void setCurrentDepth(int depth) { this.currentDepth = depth; }
+
+    public void setTierEquipment(MinerTier tier) {
+        var pick = switch (tier) {
+            case WOOD      -> Items.WOODEN_PICKAXE;
+            case STONE     -> Items.STONE_PICKAXE;
+            case IRON      -> Items.IRON_PICKAXE;
+            case DIAMOND   -> Items.DIAMOND_PICKAXE;
+            case NETHERITE -> Items.NETHERITE_PICKAXE;
+        };
+        setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(pick));
+    }
 }

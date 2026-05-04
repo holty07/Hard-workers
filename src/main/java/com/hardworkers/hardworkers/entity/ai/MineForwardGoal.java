@@ -69,7 +69,8 @@ public class MineForwardGoal extends Goal {
         if (facing == null) return;
 
         BlockPos homePos  = miner.getHomePosition();
-        BlockPos facePos  = homePos.relative(facing, depth);
+        // Mine behind the block (opposite of FACING so the drill-face points toward the player)
+        BlockPos facePos  = homePos.relative(facing.getOpposite(), depth);
 
         // Walk toward the current mining face and look at it
         miner.getNavigation().moveTo(facePos.getX() + 0.5, facePos.getY(), facePos.getZ() + 0.5, 0.85);

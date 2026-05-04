@@ -98,6 +98,7 @@ public class MinerBlock extends BaseEntityBlock {
             MinerEntity miner = ModEntities.MINER.get().create(level);
             if (miner != null) {
                 miner.setHomePosition(pos);
+                miner.setTierEquipment(this.tier);
                 miner.moveTo(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 0f, 0f);
                 level.addFreshEntity(miner);
             }

@@ -1,16 +1,20 @@
 package com.hardworkers.hardworkers.entity;
 
+import com.hardworkers.hardworkers.block.LumberjackTier;
 import com.hardworkers.hardworkers.entity.ai.ChopTreeGoal;
 import com.hardworkers.hardworkers.entity.ai.FindTreeGoal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 
 public class LumberjackEntity extends PathfinderMob {
@@ -76,11 +80,17 @@ public class LumberjackEntity extends PathfinderMob {
         this.homePosition = pos;
     }
 
-    public BlockPos getTargetTree() {
-        return targetTree;
-    }
+    public BlockPos getTargetTree() { return targetTree; }
+    public void setTargetTree(BlockPos pos) { this.targetTree = pos; }
 
-    public void setTargetTree(BlockPos pos) {
-        this.targetTree = pos;
+    public void setTierEquipment(LumberjackTier tier) {
+        var axe = switch (tier) {
+            case WOOD      -> Items.WOODEN_AXE;
+            case STONE     -> Items.STONE_AXE;
+            case IRON      -> Items.IRON_AXE;
+            case DIAMOND   -> Items.DIAMOND_AXE;
+            case NETHERITE -> Items.NETHERITE_AXE;
+        };
+        setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(axe));
     }
 }

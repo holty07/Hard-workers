@@ -5,6 +5,7 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
+import net.minecraft.client.renderer.entity.layers.ItemInHandLayer;
 import net.minecraft.resources.ResourceLocation;
 
 public class MinerRenderer extends HumanoidMobRenderer<MinerEntity, HumanoidModel<MinerEntity>> {
@@ -14,6 +15,7 @@ public class MinerRenderer extends HumanoidMobRenderer<MinerEntity, HumanoidMode
 
     public MinerRenderer(EntityRendererProvider.Context ctx) {
         super(ctx, new HumanoidModel<>(ctx.bakeLayer(ModelLayers.PLAYER_INNER_ARMOR)), 0.5f);
+        addLayer(new ItemInHandLayer<>(this, ctx.getItemInHandRenderer()));
     }
 
     @Override
@@ -21,3 +23,4 @@ public class MinerRenderer extends HumanoidMobRenderer<MinerEntity, HumanoidMode
         return TEXTURE;
     }
 }
+
