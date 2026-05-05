@@ -4,6 +4,7 @@ import com.hardworkers.hardworkers.HardWorkers;
 import com.hardworkers.hardworkers.entity.FarmerEntity;
 import com.hardworkers.hardworkers.entity.LumberjackEntity;
 import com.hardworkers.hardworkers.entity.MinerEntity;
+import com.hardworkers.hardworkers.entity.WarehouseWorkerEntity;
 import com.hardworkers.hardworkers.init.ModBlockEntities;
 import com.hardworkers.hardworkers.init.ModEntities;
 import com.hardworkers.hardworkers.init.ModItems;
@@ -23,6 +24,7 @@ public class ModEventSubscriber {
         event.put(ModEntities.LUMBERJACK.get(), LumberjackEntity.createAttributes().build());
         event.put(ModEntities.MINER.get(), MinerEntity.createAttributes().build());
         event.put(ModEntities.FARMER.get(), FarmerEntity.createAttributes().build());
+        event.put(ModEntities.WAREHOUSE_WORKER.get(), WarehouseWorkerEntity.createAttributes().build());
     }
 
     @SubscribeEvent
@@ -43,6 +45,11 @@ public class ModEventSubscriber {
             event.accept(ModItems.FARMER_IRON_ITEM);
             event.accept(ModItems.FARMER_DIAMOND_ITEM);
             event.accept(ModItems.FARMER_NETHERITE_ITEM);
+            event.accept(ModItems.WAREHOUSE_WOOD_ITEM);
+            event.accept(ModItems.WAREHOUSE_STONE_ITEM);
+            event.accept(ModItems.WAREHOUSE_IRON_ITEM);
+            event.accept(ModItems.WAREHOUSE_DIAMOND_ITEM);
+            event.accept(ModItems.WAREHOUSE_NETHERITE_ITEM);
         }
     }
 
@@ -61,6 +68,11 @@ public class ModEventSubscriber {
         event.registerBlockEntity(
             Capabilities.ItemHandler.BLOCK,
             ModBlockEntities.FARMER_BLOCK_ENTITY.get(),
+            (be, side) -> be.getItemHandler()
+        );
+        event.registerBlockEntity(
+            Capabilities.ItemHandler.BLOCK,
+            ModBlockEntities.WAREHOUSE_BLOCK_ENTITY.get(),
             (be, side) -> be.getItemHandler()
         );
     }

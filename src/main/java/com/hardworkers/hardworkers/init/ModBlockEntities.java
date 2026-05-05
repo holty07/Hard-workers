@@ -4,6 +4,7 @@ import com.hardworkers.hardworkers.HardWorkers;
 import com.hardworkers.hardworkers.blockentity.FarmerBlockEntity;
 import com.hardworkers.hardworkers.blockentity.LumberjackBlockEntity;
 import com.hardworkers.hardworkers.blockentity.MinerBlockEntity;
+import com.hardworkers.hardworkers.blockentity.WarehouseBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -47,6 +48,18 @@ public class ModBlockEntities {
                 ModBlocks.FARMER_IRON.get(),
                 ModBlocks.FARMER_DIAMOND.get(),
                 ModBlocks.FARMER_NETHERITE.get()
+            ).build(null)
+        );
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<WarehouseBlockEntity>> WAREHOUSE_BLOCK_ENTITY =
+        BLOCK_ENTITY_TYPES.register("warehouse_block", () ->
+            BlockEntityType.Builder.of(
+                WarehouseBlockEntity::new,
+                ModBlocks.WAREHOUSE_WOOD.get(),
+                ModBlocks.WAREHOUSE_STONE.get(),
+                ModBlocks.WAREHOUSE_IRON.get(),
+                ModBlocks.WAREHOUSE_DIAMOND.get(),
+                ModBlocks.WAREHOUSE_NETHERITE.get()
             ).build(null)
         );
 }

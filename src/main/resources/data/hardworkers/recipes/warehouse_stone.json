@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["SSS", "SWS", "SSS"],
+  "key": {
+    "S": {"item": "minecraft:cobblestone"},
+    "W": {"item": "hardworkers:warehouse_wood"}
+  },
+  "result": {"id": "hardworkers:warehouse_stone", "count": 1}
+}

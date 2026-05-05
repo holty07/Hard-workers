@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["DDD", "DWD", "DDD"],
+  "key": {
+    "D": {"item": "minecraft:diamond"},
+    "W": {"item": "hardworkers:warehouse_iron"}
+  },
+  "result": {"id": "hardworkers:warehouse_diamond", "count": 1}
+}

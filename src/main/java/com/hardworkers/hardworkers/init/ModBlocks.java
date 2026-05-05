@@ -7,6 +7,8 @@ import com.hardworkers.hardworkers.block.LumberjackBlock;
 import com.hardworkers.hardworkers.block.LumberjackTier;
 import com.hardworkers.hardworkers.block.MinerBlock;
 import com.hardworkers.hardworkers.block.MinerTier;
+import com.hardworkers.hardworkers.block.WarehouseBlock;
+import com.hardworkers.hardworkers.block.WarehouseTier;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -74,5 +76,25 @@ public class ModBlocks {
     public static final DeferredBlock<FarmerBlock> FARMER_NETHERITE =
         BLOCKS.register("farmer_netherite",
             () -> new FarmerBlock(FarmerTier.NETHERITE, FarmerBlock.baseProperties(MapColor.COLOR_BLACK)));
+
+    public static final DeferredBlock<WarehouseBlock> WAREHOUSE_WOOD =
+        BLOCKS.register("warehouse_wood",
+            () -> new WarehouseBlock(WarehouseTier.WOOD, WarehouseBlock.baseProperties(MapColor.WOOD)));
+
+    public static final DeferredBlock<WarehouseBlock> WAREHOUSE_STONE =
+        BLOCKS.register("warehouse_stone",
+            () -> new WarehouseBlock(WarehouseTier.STONE, WarehouseBlock.baseProperties(MapColor.STONE)));
+
+    public static final DeferredBlock<WarehouseBlock> WAREHOUSE_IRON =
+        BLOCKS.register("warehouse_iron",
+            () -> new WarehouseBlock(WarehouseTier.IRON, WarehouseBlock.baseProperties(MapColor.METAL)));
+
+    public static final DeferredBlock<WarehouseBlock> WAREHOUSE_DIAMOND =
+        BLOCKS.register("warehouse_diamond",
+            () -> new WarehouseBlock(WarehouseTier.DIAMOND, WarehouseBlock.baseProperties(MapColor.DIAMOND)));
+
+    public static final DeferredBlock<WarehouseBlock> WAREHOUSE_NETHERITE =
+        BLOCKS.register("warehouse_netherite",
+            () -> new WarehouseBlock(WarehouseTier.NETHERITE, WarehouseBlock.baseProperties(MapColor.COLOR_BLACK)));
 }
 

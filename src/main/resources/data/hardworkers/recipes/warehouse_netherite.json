@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["NNN", "NWN", "NNN"],
+  "key": {
+    "N": {"item": "minecraft:netherite_ingot"},
+    "W": {"item": "hardworkers:warehouse_diamond"}
+  },
+  "result": {"id": "hardworkers:warehouse_netherite", "count": 1}
+}

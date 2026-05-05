@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down":  "hardworkers:block/warehouse_netherite_bottom",
+    "up":    "hardworkers:block/warehouse_netherite_top",
+    "north": "hardworkers:block/warehouse_netherite_front",
+    "south": "hardworkers:block/warehouse_netherite_back",
+    "east":  "hardworkers:block/warehouse_netherite_side",
+    "west":  "hardworkers:block/warehouse_netherite_side",
+    "particle": "hardworkers:block/warehouse_netherite_side"
+  }
+}

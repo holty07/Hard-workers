@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["III", "IWI", "III"],
+  "key": {
+    "I": {"item": "minecraft:iron_ingot"},
+    "W": {"item": "hardworkers:warehouse_stone"}
+  },
+  "result": {"id": "hardworkers:warehouse_iron", "count": 1}
+}

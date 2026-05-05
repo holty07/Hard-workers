@@ -18,5 +18,14 @@
   "block.hardworkers.farmer_iron":      "Farmer Block (Iron)",
   "block.hardworkers.farmer_diamond":   "Farmer Block (Diamond)",
   "block.hardworkers.farmer_netherite": "Farmer Block (Netherite)",
-  "entity.hardworkers.farmer":          "Farmer"
+  "entity.hardworkers.farmer":          "Farmer",
+
+  "block.hardworkers.warehouse_wood":      "Warehouse Block (Wood)",
+  "block.hardworkers.warehouse_stone":     "Warehouse Block (Stone)",
+  "block.hardworkers.warehouse_iron":      "Warehouse Block (Iron)",
+  "block.hardworkers.warehouse_diamond":   "Warehouse Block (Diamond)",
+  "block.hardworkers.warehouse_netherite": "Warehouse Block (Netherite)",
+  "entity.hardworkers.warehouse_worker":   "Warehouse Worker",
+
+  "container.hardworkers.warehouse": "Warehouse Storage"
 }

@@ -4,6 +4,7 @@ import com.hardworkers.hardworkers.HardWorkers;
 import com.hardworkers.hardworkers.entity.client.FarmerRenderer;
 import com.hardworkers.hardworkers.entity.client.LumberjackRenderer;
 import com.hardworkers.hardworkers.entity.client.MinerRenderer;
+import com.hardworkers.hardworkers.entity.client.WarehouseWorkerRenderer;
 import com.hardworkers.hardworkers.init.ModEntities;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -18,5 +19,6 @@ public class ClientEvents {
         event.registerEntityRenderer(ModEntities.LUMBERJACK.get(), LumberjackRenderer::new);
         event.registerEntityRenderer(ModEntities.MINER.get(), MinerRenderer::new);
         event.registerEntityRenderer(ModEntities.FARMER.get(), FarmerRenderer::new);
+        event.registerEntityRenderer(ModEntities.WAREHOUSE_WORKER.get(), WarehouseWorkerRenderer::new);
     }
 }
