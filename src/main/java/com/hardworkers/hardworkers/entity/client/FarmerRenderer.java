@@ -14,7 +14,7 @@ public class FarmerRenderer extends HumanoidMobRenderer<FarmerEntity, HumanoidMo
         ResourceLocation.fromNamespaceAndPath("hardworkers", "textures/entity/farmer.png");
 
     public FarmerRenderer(EntityRendererProvider.Context ctx) {
-        super(ctx, new HumanoidModel<>(ctx.bakeLayer(ModelLayers.PLAYER_INNER_ARMOR)), 0.5f);
+        super(ctx, new HumanoidModel<>(ctx.bakeLayer(ModelLayers.PLAYER)), 0.5f);
         addLayer(new ItemInHandLayer<>(this, ctx.getItemInHandRenderer()));
     }
 

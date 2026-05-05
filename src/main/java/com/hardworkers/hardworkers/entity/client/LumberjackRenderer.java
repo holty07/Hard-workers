@@ -14,7 +14,7 @@ public class LumberjackRenderer extends HumanoidMobRenderer<LumberjackEntity, Hu
         ResourceLocation.fromNamespaceAndPath("hardworkers", "textures/entity/lumberjack.png");
 
     public LumberjackRenderer(EntityRendererProvider.Context ctx) {
-        super(ctx, new HumanoidModel<>(ctx.bakeLayer(ModelLayers.PLAYER_INNER_ARMOR)), 0.5f);
+        super(ctx, new HumanoidModel<>(ctx.bakeLayer(ModelLayers.PLAYER)), 0.5f);
         addLayer(new ItemInHandLayer<>(this, ctx.getItemInHandRenderer()));
     }
 
