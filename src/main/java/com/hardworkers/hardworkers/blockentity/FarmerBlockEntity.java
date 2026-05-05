@@ -16,14 +16,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.CocoaBlock;
-import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.FarmBlock;
 import net.minecraft.world.level.block.NetherWartBlock;
-import net.minecraft.world.level.block.StemBlock;
 import net.minecraft.world.level.block.SweetBerryBushBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
 
@@ -90,15 +90,25 @@ public class FarmerBlockEntity extends BlockEntity implements Container {
                     BlockPos p = center.offset(dx, dy, dz);
                     BlockState s = level.getBlockState(p);
                     Block b = s.getBlock();
-                    if (b instanceof CropBlock
-                            || b instanceof NetherWartBlock
-                            || b instanceof CocoaBlock
-                            || b instanceof SweetBerryBushBlock
-                            || b instanceof StemBlock) {
-                        b.randomTick(s, level, p, level.random);
+                    if (b instanceof BonemealableBlock bm && bm.isValidBonemealTarget(level, p, s)) {
+                        bm.performBonemeal(level, level.random, p, s);
+                    } else if (b instanceof NetherWartBlock) {
+                        advanceAge(level, p, s, NetherWartBlock.AGE, 3);
+                    } else if (b instanceof CocoaBlock) {
+                        advanceAge(level, p, s, CocoaBlock.AGE, 2);
+                    } else if (b instanceof SweetBerryBushBlock) {
+                        advanceAge(level, p, s, SweetBerryBushBlock.AGE, 3);
                     }
                 }
             }
+        }
+    }
+
+    private static void advanceAge(ServerLevel level, BlockPos pos, BlockState state,
+                                   IntegerProperty ageProp, int maxAge) {
+        int age = state.getValue(ageProp);
+        if (age < maxAge) {
+            level.setBlock(pos, state.setValue(ageProp, age + 1), Block.UPDATE_CLIENTS);
         }
     }
 
