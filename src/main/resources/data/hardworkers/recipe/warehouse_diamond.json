@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": ["WTW", "WCW", "WBW"],
+  "key": {
+    "W": {"tag": "minecraft:planks"},
+    "T": {"item": "minecraft:diamond"},
+    "C": {"item": "minecraft:chest"},
+    "B": {"item": "hardworkers:warehouse_iron"}
+  },
+  "result": {"id": "hardworkers:warehouse_diamond", "count": 1}
+}
