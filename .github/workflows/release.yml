@@ -42,9 +42,6 @@ jobs:
           parts = '$CURRENT'.split('.')
           major, minor = int(parts[0]), int(parts[1])
           minor += 1
-          if minor >= 10:
-              major += 1
-              minor = 0
           print(f'{major}.{minor}')
           ")
           sed -i "s/^mod_version=.*/mod_version=$NEW/" gradle.properties
