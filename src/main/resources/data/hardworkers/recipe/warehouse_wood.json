@@ -1,8 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
-  "pattern": ["PPP", "PCP", "PPP"],
+  "category": "misc",
+  "pattern": ["WWW", "WCW", "WWW"],
   "key": {
-    "P": {"item": "minecraft:oak_planks"},
+    "W": {"tag": "minecraft:planks"},
     "C": {"item": "minecraft:chest"}
   },
   "result": {"id": "hardworkers:warehouse_wood", "count": 1}

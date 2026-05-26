@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": ["WTW", "WCW", "WBW"],
+  "key": {
+    "W": {"tag": "minecraft:planks"},
+    "T": {"item": "minecraft:netherite_ingot"},
+    "C": {"item": "minecraft:chest"},
+    "B": {"item": "hardworkers:warehouse_diamond"}
+  },
+  "result": {"id": "hardworkers:warehouse_netherite", "count": 1}
+}
