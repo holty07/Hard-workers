@@ -6,7 +6,7 @@ entityDistanceScaling:1.0
 entityShadows:true
 forceUnicodeFont:false
 japaneseGlyphVariants:false
-fov:1.0
+fov:0.0
 fovEffectScale:1.0
 darknessEffectScale:1.0
 glintSpeed:0.5
@@ -71,7 +71,7 @@ notificationDisplayTime:1.0
 useNativeTransport:true
 mainHand:"right"
 attackIndicator:1
-tutorialStep:none
+tutorialStep:movement
 mouseWheelSensitivity:1.0
 rawMouseInput:true
 glDebugVerbosity:1
@@ -122,8 +122,8 @@ key_key.hotbar.7:key.keyboard.7
 key_key.hotbar.8:key.keyboard.8
 key_key.hotbar.9:key.keyboard.9
 soundCategory_master:1.0
-soundCategory_music:0.0
-soundCategory_record:0.0
+soundCategory_music:1.0
+soundCategory_record:1.0
 soundCategory_weather:1.0
 soundCategory_block:1.0
 soundCategory_hostile:1.0
