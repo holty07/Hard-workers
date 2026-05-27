@@ -2,7 +2,8 @@ name: Build and Release
 
 on:
   push:
-    branches: [main]
+    tags:
+      - 'v*'
 
 jobs:
   release:
@@ -13,9 +14,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
@@ -32,37 +30,26 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle-
 
-      - name: Increment version
+      - name: Get version from tag
         id: version
         run: |
-          CURRENT=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2)
-          NEW=$(python3 -c "
-          parts = '$CURRENT'.split('.')
-          major, minor = int(parts[0]), int(parts[1])
-          minor += 1
-          print(f'{major}.{minor}')
-          ")
-          sed -i "s/^mod_version=.*/mod_version=$NEW/" gradle.properties
-          echo "version=$NEW" >> "$GITHUB_OUTPUT"
-          echo "Bumped $CURRENT → $NEW"
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Building version $VERSION"
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
       - name: Build
-        run: ./gradlew build
-
-      - name: Commit version bump
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add gradle.properties
-          git commit -m "chore: bump version to ${{ steps.version.outputs.version }} [skip ci]"
-          git push
+        run: ./gradlew build -Pmod_version=${{ steps.version.outputs.version }}
 
       - name: Create release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          JAR=$(find build/libs -name "hardworkers-*.jar" ! -name "*-sources*" | head -1)
-          gh release create "v${{ steps.version.outputs.version }}" \
+          JAR=$(find build/libs -name "hardworkers-*.jar" ! -name "*-sources*" ! -name "*-dev*" | head -1)
+          if [ -z "$JAR" ]; then echo "No jar found!" >&2; exit 1; fi
+          gh release create "${GITHUB_REF_NAME}" \
             "$JAR#hardworkers-${{ steps.version.outputs.version }}.jar" \
-            --title "Hard Workers v${{ steps.version.outputs.version }}" \
+            --title "Hard Workers ${GITHUB_REF_NAME}" \
             --generate-notes
