@@ -3,6 +3,8 @@ package com.hardworkers.hardworkers.block;
 import com.hardworkers.hardworkers.blockentity.MinerBlockEntity;
 import com.hardworkers.hardworkers.entity.MinerEntity;
 import com.hardworkers.hardworkers.init.ModEntities;
+import com.hardworkers.hardworkers.world.WorkerChunkManager;
+import net.minecraft.server.level.ServerLevel;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -102,6 +104,7 @@ public class MinerBlock extends BaseEntityBlock {
                 miner.moveTo(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 0f, 0f);
                 level.addFreshEntity(miner);
             }
+            WorkerChunkManager.get((ServerLevel) level).claimChunk((ServerLevel) level, pos);
         }
     }
 
@@ -116,6 +119,7 @@ public class MinerBlock extends BaseEntityBlock {
                 .stream()
                 .filter(e -> pos.equals(e.getHomePosition()))
                 .forEach(MinerEntity::discard);
+            WorkerChunkManager.get((ServerLevel) level).releaseChunk((ServerLevel) level, pos);
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
     }

@@ -24,6 +24,7 @@ public class LumberjackEntity extends PathfinderMob {
 
     public LumberjackEntity(EntityType<? extends LumberjackEntity> type, Level level) {
         super(type, level);
+        setPersistenceRequired();
     }
 
     public static AttributeSupplier.Builder createAttributes() {

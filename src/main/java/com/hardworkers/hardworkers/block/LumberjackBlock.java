@@ -3,6 +3,8 @@ package com.hardworkers.hardworkers.block;
 import com.hardworkers.hardworkers.blockentity.LumberjackBlockEntity;
 import com.hardworkers.hardworkers.entity.LumberjackEntity;
 import com.hardworkers.hardworkers.init.ModEntities;
+import com.hardworkers.hardworkers.world.WorkerChunkManager;
+import net.minecraft.server.level.ServerLevel;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -114,6 +116,7 @@ public class LumberjackBlock extends BaseEntityBlock {
                 lumberjack.moveTo(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 0f, 0f);
                 level.addFreshEntity(lumberjack);
             }
+            WorkerChunkManager.get((ServerLevel) level).claimChunk((ServerLevel) level, pos);
         }
     }
 
@@ -128,6 +131,7 @@ public class LumberjackBlock extends BaseEntityBlock {
                 .stream()
                 .filter(e -> pos.equals(e.getHomePosition()))
                 .forEach(LumberjackEntity::discard);
+            WorkerChunkManager.get((ServerLevel) level).releaseChunk((ServerLevel) level, pos);
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
     }
