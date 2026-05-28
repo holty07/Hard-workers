@@ -23,6 +23,7 @@ public class MinerEntity extends PathfinderMob {
 
     public MinerEntity(EntityType<? extends MinerEntity> type, Level level) {
         super(type, level);
+        setPersistenceRequired();
     }
 
     public static AttributeSupplier.Builder createAttributes() {

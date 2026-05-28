@@ -1,0 +1,5 @@
+/forceload query
+/tp 1000
+/tp @a 1000
+/tp 1000 71.43
+/forceload query

@@ -4,6 +4,8 @@ import com.hardworkers.hardworkers.blockentity.WarehouseBlockEntity;
 import com.hardworkers.hardworkers.entity.WarehouseWorkerEntity;
 import com.hardworkers.hardworkers.init.ModBlockEntities;
 import com.hardworkers.hardworkers.init.ModEntities;
+import com.hardworkers.hardworkers.world.WorkerChunkManager;
+import net.minecraft.server.level.ServerLevel;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -103,6 +105,7 @@ public class WarehouseBlock extends BaseEntityBlock {
                 worker.moveTo(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 0f, 0f);
                 level.addFreshEntity(worker);
             }
+            WorkerChunkManager.get((ServerLevel) level).claimChunk((ServerLevel) level, pos);
         }
     }
 
@@ -117,6 +120,7 @@ public class WarehouseBlock extends BaseEntityBlock {
                 .stream()
                 .filter(e -> pos.equals(e.getHomePosition()))
                 .forEach(WarehouseWorkerEntity::discard);
+            WorkerChunkManager.get((ServerLevel) level).releaseChunk((ServerLevel) level, pos);
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
     }

@@ -22,6 +22,7 @@ public class FarmerEntity extends PathfinderMob {
 
     public FarmerEntity(EntityType<? extends FarmerEntity> type, Level level) {
         super(type, level);
+        setPersistenceRequired();
     }
 
     public static AttributeSupplier.Builder createAttributes() {

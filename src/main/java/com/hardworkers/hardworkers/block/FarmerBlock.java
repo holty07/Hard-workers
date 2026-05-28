@@ -4,6 +4,8 @@ import com.hardworkers.hardworkers.blockentity.FarmerBlockEntity;
 import com.hardworkers.hardworkers.entity.FarmerEntity;
 import com.hardworkers.hardworkers.init.ModBlockEntities;
 import com.hardworkers.hardworkers.init.ModEntities;
+import com.hardworkers.hardworkers.world.WorkerChunkManager;
+import net.minecraft.server.level.ServerLevel;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -112,6 +114,7 @@ public class FarmerBlock extends BaseEntityBlock {
                 farmer.moveTo(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 0f, 0f);
                 level.addFreshEntity(farmer);
             }
+            WorkerChunkManager.get((ServerLevel) level).claimChunk((ServerLevel) level, pos);
         }
     }
 
@@ -126,6 +129,7 @@ public class FarmerBlock extends BaseEntityBlock {
                 .stream()
                 .filter(e -> pos.equals(e.getHomePosition()))
                 .forEach(FarmerEntity::discard);
+            WorkerChunkManager.get((ServerLevel) level).releaseChunk((ServerLevel) level, pos);
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
     }

@@ -1,0 +1,6 @@
+#Lumberjack Settings
+[lumberjack]
+	#Radius in blocks the lumberjack searches for trees around its home block
+	# Default: 16
+	# Range: 4 ~ 64
+	searchRadius = 16
