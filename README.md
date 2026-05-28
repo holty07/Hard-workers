@@ -23,7 +23,7 @@ Each worker block has a built-in 27-slot inventory. Workers stop when full. The 
 
 ## Installation
 
-Drop the JAR from the [Releases](../../releases) page into your `mods/` folder alongside NeoForge 21.1.172.
+Drop the JAR from the Releases page into your `mods/` folder alongside NeoForge 21.1.172.
 
 ## License
 
