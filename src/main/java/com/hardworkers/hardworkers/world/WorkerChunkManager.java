@@ -1,6 +1,7 @@
 package com.hardworkers.hardworkers.world;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -13,8 +14,8 @@ import java.util.Map;
 
 public class WorkerChunkManager extends SavedData {
 
-    public static final Factory<WorkerChunkManager> FACTORY =
-            new Factory<>(WorkerChunkManager::new, WorkerChunkManager::load);
+    public static final SavedData.Factory<WorkerChunkManager> FACTORY =
+            new SavedData.Factory<>(WorkerChunkManager::new, WorkerChunkManager::load);
     private static final String DATA_NAME = "hardworkers_chunks";
 
     private final Map<Long, Integer> refCounts = new HashMap<>();
@@ -23,7 +24,7 @@ public class WorkerChunkManager extends SavedData {
         return level.getDataStorage().computeIfAbsent(FACTORY, DATA_NAME);
     }
 
-    private static WorkerChunkManager load(CompoundTag tag) {
+    private static WorkerChunkManager load(CompoundTag tag, HolderLookup.Provider registries) {
         WorkerChunkManager manager = new WorkerChunkManager();
         ListTag list = tag.getList("chunks", Tag.TAG_COMPOUND);
         for (int i = 0; i < list.size(); i++) {
@@ -37,7 +38,7 @@ public class WorkerChunkManager extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag) {
+    public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
         ListTag list = new ListTag();
         refCounts.forEach((key, count) -> {
             CompoundTag e = new CompoundTag();
