@@ -7,13 +7,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Scans the configurable area around the lumberjack's home block for the base
@@ -81,7 +81,8 @@ public class FindTreeGoal extends Goal {
                     if (claimed.contains(candidate)) continue;
 
                     BlockState state = level.getBlockState(candidate);
-                    if (state.is(BlockTags.LOGS) && isBaseLog(level, candidate)) {
+                    if (state.is(BlockTags.LOGS) && isBaseLog(level, candidate)
+                            && isActualTree(level, candidate)) {
                         double distSq = home.distSqr(candidate);
                         if (distSq < nearestDistSq) {
                             nearestDistSq = distSq;
@@ -109,5 +110,80 @@ public class FindTreeGoal extends Goal {
     /** A base log is a log block that does not have another log directly below it. */
     private boolean isBaseLog(Level level, BlockPos pos) {
         return !level.getBlockState(pos.below()).is(BlockTags.LOGS);
+    }
+
+    /**
+     * Verifies that the log cluster rooted at {@code base} is a real tree by
+     * confirming at least 2 leaf blocks of the matching wood type are present
+     * within a 3-block margin of the connected logs.
+     */
+    private boolean isActualTree(Level level, BlockPos base) {
+        Block expectedLeaves = leavesFor(level.getBlockState(base).getBlock());
+
+        // BFS to collect connected logs (capped to avoid O(n²) in dense areas).
+        Set<BlockPos> logSet = new HashSet<>();
+        Queue<BlockPos> queue = new ArrayDeque<>();
+        queue.add(base);
+        logSet.add(base);
+
+        while (!queue.isEmpty() && logSet.size() < 256) {
+            BlockPos current = queue.poll();
+            BlockPos[] neighbours = {
+                current.above(),
+                current.north(), current.south(), current.east(), current.west(),
+                current.above().north(), current.above().south(),
+                current.above().east(), current.above().west()
+            };
+            for (BlockPos next : neighbours) {
+                if (!logSet.contains(next) && level.getBlockState(next).is(BlockTags.LOGS)) {
+                    logSet.add(next);
+                    queue.add(next);
+                }
+            }
+        }
+
+        // Compute bounding box of all logs.
+        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
+        for (BlockPos p : logSet) {
+            if (p.getX() < minX) minX = p.getX();
+            if (p.getY() < minY) minY = p.getY();
+            if (p.getZ() < minZ) minZ = p.getZ();
+            if (p.getX() > maxX) maxX = p.getX();
+            if (p.getY() > maxY) maxY = p.getY();
+            if (p.getZ() > maxZ) maxZ = p.getZ();
+        }
+
+        // Scan a 3-block margin for at least 2 matching leaf blocks.
+        int margin = 3;
+        int leafCount = 0;
+        outer:
+        for (int x = minX - margin; x <= maxX + margin; x++) {
+            for (int y = minY - 1; y <= maxY + margin; y++) {
+                for (int z = minZ - margin; z <= maxZ + margin; z++) {
+                    BlockPos p = new BlockPos(x, y, z);
+                    if (logSet.contains(p)) continue;
+                    BlockState state = level.getBlockState(p);
+                    if (state.is(BlockTags.LEAVES)
+                            && (expectedLeaves == null || state.getBlock() == expectedLeaves)) {
+                        if (++leafCount >= 2) break outer;
+                    }
+                }
+            }
+        }
+        return leafCount >= 2;
+    }
+
+    /** Maps a log block to its corresponding leaf block; returns null for unknown types. */
+    private Block leavesFor(Block log) {
+        if (log == Blocks.OAK_LOG         || log == Blocks.STRIPPED_OAK_LOG)         return Blocks.OAK_LEAVES;
+        if (log == Blocks.BIRCH_LOG        || log == Blocks.STRIPPED_BIRCH_LOG)        return Blocks.BIRCH_LEAVES;
+        if (log == Blocks.SPRUCE_LOG       || log == Blocks.STRIPPED_SPRUCE_LOG)       return Blocks.SPRUCE_LEAVES;
+        if (log == Blocks.JUNGLE_LOG       || log == Blocks.STRIPPED_JUNGLE_LOG)       return Blocks.JUNGLE_LEAVES;
+        if (log == Blocks.ACACIA_LOG       || log == Blocks.STRIPPED_ACACIA_LOG)       return Blocks.ACACIA_LEAVES;
+        if (log == Blocks.DARK_OAK_LOG     || log == Blocks.STRIPPED_DARK_OAK_LOG)     return Blocks.DARK_OAK_LEAVES;
+        if (log == Blocks.MANGROVE_LOG     || log == Blocks.STRIPPED_MANGROVE_LOG)     return Blocks.MANGROVE_LEAVES;
+        if (log == Blocks.CHERRY_LOG       || log == Blocks.STRIPPED_CHERRY_LOG)       return Blocks.CHERRY_LEAVES;
+        return null; // unknown log type — accept any leaves
     }
 }
