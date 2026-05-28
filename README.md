@@ -19,7 +19,7 @@ Each worker block has a built-in 27-slot inventory. Workers stop when full. The 
 
 ## Current Version
 
-**v0.1** — NeoForge 21.1.172 / Minecraft 1.21.1
+**v0.3** — NeoForge 21.1.172 / Minecraft 1.21.1
 
 ## Installation
 
