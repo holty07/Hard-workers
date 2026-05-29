@@ -14,21 +14,21 @@
       "id": "body",
       "part": "body",
       "animations": [
-        { "variable": "body.rx", "function": "none", "args": ["limbSwingAmount < 0.02 ? -0.17 : 0"] }
+        { "variable": "body.rx", "function": "none", "args": ["limbSwingAmount < 0.15 ? -0.17 : 0"] }
       ]
     },
     {
       "id": "rightArm",
       "part": "rightArm",
       "animations": [
-        { "variable": "rightArm.rx", "function": "none", "args": ["limbSwingAmount < 0.02 ? (-1.57 + sin(age * 0.4) * 0.52) : (sin(limbSwing * 0.6662) * 2 * limbSwingAmount * 0.5)"] }
+        { "variable": "rightArm.rx", "function": "none", "args": ["limbSwingAmount < 0.15 ? (-1.57 + sin(age * 0.4) * 0.52) : (sin(limbSwing * 0.6662) * 2 * limbSwingAmount * 0.5)"] }
       ]
     },
     {
       "id": "leftArm",
       "part": "leftArm",
       "animations": [
-        { "variable": "leftArm.rx", "function": "none", "args": ["limbSwingAmount < 0.02 ? (-1.2 + sin(age * 0.4 + 0.4) * 0.26) : -(sin(limbSwing * 0.6662) * 2 * limbSwingAmount * 0.5)"] }
+        { "variable": "leftArm.rx", "function": "none", "args": ["limbSwingAmount < 0.15 ? (-1.2 + sin(age * 0.4 + 0.4) * 0.26) : -(sin(limbSwing * 0.6662) * 2 * limbSwingAmount * 0.5)"] }
       ]
     },
     {
