@@ -1,0 +1,49 @@
+{
+  "credit": "hardworkers",
+  "textureSize": [64, 64],
+  "models": [
+    {
+      "id": "head",
+      "part": "head",
+      "animations": [
+        { "variable": "head.rx", "function": "none", "args": ["headPitch * 0.017453292"] },
+        { "variable": "head.ry", "function": "none", "args": ["headYaw * 0.017453292"] }
+      ]
+    },
+    {
+      "id": "body",
+      "part": "body",
+      "animations": [
+        { "variable": "body.rx", "function": "none", "args": ["limbSwingAmount < 0.02 ? (-0.26 + sin(age * 0.25) * 0.17) : 0"] }
+      ]
+    },
+    {
+      "id": "rightArm",
+      "part": "rightArm",
+      "animations": [
+        { "variable": "rightArm.rx", "function": "none", "args": ["limbSwingAmount < 0.02 ? (-1.05 + sin(age * 0.25) * 0.61) : (sin(limbSwing * 0.6662) * 2 * limbSwingAmount * 0.5)"] }
+      ]
+    },
+    {
+      "id": "leftArm",
+      "part": "leftArm",
+      "animations": [
+        { "variable": "leftArm.rx", "function": "none", "args": ["limbSwingAmount < 0.02 ? 0 : -(sin(limbSwing * 0.6662) * 2 * limbSwingAmount * 0.5)"] }
+      ]
+    },
+    {
+      "id": "rightLeg",
+      "part": "rightLeg",
+      "animations": [
+        { "variable": "rightLeg.rx", "function": "none", "args": ["sin(limbSwing * 0.6662) * 1.4 * limbSwingAmount"] }
+      ]
+    },
+    {
+      "id": "leftLeg",
+      "part": "leftLeg",
+      "animations": [
+        { "variable": "leftLeg.rx", "function": "none", "args": ["-sin(limbSwing * 0.6662) * 1.4 * limbSwingAmount"] }
+      ]
+    }
+  ]
+}
