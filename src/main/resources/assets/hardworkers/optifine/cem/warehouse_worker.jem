@@ -21,14 +21,14 @@
       "id": "rightArm",
       "part": "rightArm",
       "animations": [
-        { "variable": "rightArm.rx", "function": "none", "args": ["limbSwingAmount < 0.02 ? (-0.7 + sin(age * 0.35) * 0.35) : (sin(limbSwing * 0.6662) * 2 * limbSwingAmount * 0.5)"] }
+        { "variable": "rightArm.rx", "function": "none", "args": ["limbSwingAmount < 0.15 ? (-0.7 + sin(age * 0.35) * 0.35) : (sin(limbSwing * 0.6662) * 2 * limbSwingAmount * 0.5)"] }
       ]
     },
     {
       "id": "leftArm",
       "part": "leftArm",
       "animations": [
-        { "variable": "leftArm.rx", "function": "none", "args": ["limbSwingAmount < 0.02 ? (-0.7 + sin(age * 0.35) * 0.35) : -(sin(limbSwing * 0.6662) * 2 * limbSwingAmount * 0.5)"] }
+        { "variable": "leftArm.rx", "function": "none", "args": ["limbSwingAmount < 0.15 ? (-0.7 + sin(age * 0.35) * 0.35) : -(sin(limbSwing * 0.6662) * 2 * limbSwingAmount * 0.5)"] }
       ]
     },
     {
