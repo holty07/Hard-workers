@@ -72,6 +72,7 @@ public class HarvestCropsGoal extends Goal {
 
     @Override
     public void stop() {
+        farmer.setWorking(false);
         targetCrop = null;
         harvestTimer = 0;
         farmer.getNavigation().stop();
@@ -80,6 +81,8 @@ public class HarvestCropsGoal extends Goal {
     @Override
     public void tick() {
         if (targetCrop == null) return;
+
+        farmer.setWorking(true);
 
         // Re-validate: another farmer (or random decay) may have cleared it
         if (!isMatureCrop(farmer.level().getBlockState(targetCrop))) {

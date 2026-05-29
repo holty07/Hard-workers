@@ -75,6 +75,7 @@ public class ChopTreeGoal extends Goal {
         BlockPos treePos = lumberjack.getTargetTree();
         if (treePos == null) return;
 
+        lumberjack.setWorking(true);
         pickUpNearbyItems();
 
         double distSq = lumberjack.distanceToSqr(
@@ -109,6 +110,7 @@ public class ChopTreeGoal extends Goal {
 
     @Override
     public void stop() {
+        lumberjack.setWorking(false);
         logsToChop.clear();
         leavesToClear.clear();
         clearingLeaves = false;

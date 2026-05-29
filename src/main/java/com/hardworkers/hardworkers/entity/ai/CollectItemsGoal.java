@@ -75,6 +75,8 @@ public class CollectItemsGoal extends Goal {
         BlockPos home = worker.getHomePosition();
         if (home == null) { stop(); return; }
 
+        worker.setWorking(!worker.carrying.isEmpty());
+
         if (!worker.carrying.isEmpty()) {
             // Return home and deposit
             if (worker.blockPosition().distSqr(home) <= REACH_SQ) {
@@ -108,6 +110,7 @@ public class CollectItemsGoal extends Goal {
 
     @Override
     public void stop() {
+        worker.setWorking(false);
         sourcePos = null;
         worker.getNavigation().stop();
     }

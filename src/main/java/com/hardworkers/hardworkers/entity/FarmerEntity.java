@@ -4,6 +4,9 @@ import com.hardworkers.hardworkers.block.FarmerTier;
 import com.hardworkers.hardworkers.entity.ai.HarvestCropsGoal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.PathfinderMob;
@@ -15,8 +18,23 @@ import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class FarmerEntity extends PathfinderMob {
+public class FarmerEntity extends PathfinderMob implements GeoEntity {
+
+    private static final EntityDataAccessor<Boolean> DATA_IS_WORKING =
+        SynchedEntityData.defineId(FarmerEntity.class, EntityDataSerializers.BOOLEAN);
+
+    private static final RawAnimation ANIM_IDLE    = RawAnimation.begin().thenLoop("animation.farmer.idle");
+    private static final RawAnimation ANIM_WALK    = RawAnimation.begin().thenLoop("animation.farmer.walk");
+    private static final RawAnimation ANIM_HARVEST = RawAnimation.begin().thenLoop("animation.farmer.harvest");
+
+    private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
     private BlockPos homePosition = BlockPos.ZERO;
 
@@ -30,6 +48,12 @@ public class FarmerEntity extends PathfinderMob {
             .add(Attributes.MAX_HEALTH, 20.0)
             .add(Attributes.MOVEMENT_SPEED, 0.3)
             .add(Attributes.FOLLOW_RANGE, 16.0);
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_IS_WORKING, false);
     }
 
     @Override
@@ -49,6 +73,23 @@ public class FarmerEntity extends PathfinderMob {
             }
         }
     }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "main", 5, state -> {
+            if (isWorking()) return state.setAndContinue(ANIM_HARVEST);
+            if (state.isMoving()) return state.setAndContinue(ANIM_WALK);
+            return state.setAndContinue(ANIM_IDLE);
+        }));
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return geoCache;
+    }
+
+    public boolean isWorking() { return this.entityData.get(DATA_IS_WORKING); }
+    public void setWorking(boolean working) { this.entityData.set(DATA_IS_WORKING, working); }
 
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
