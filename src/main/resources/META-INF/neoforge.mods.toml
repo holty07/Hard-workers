@@ -22,9 +22,3 @@ license="${mod_license}"
     ordering="NONE"
     side="BOTH"
 
-[[dependencies.${mod_id}]]
-    modId="geckolib"
-    type="required"
-    versionRange="[4.7,)"
-    ordering="NONE"
-    side="BOTH"

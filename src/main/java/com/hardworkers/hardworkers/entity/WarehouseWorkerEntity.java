@@ -16,26 +16,14 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.RawAnimation;
-import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class WarehouseWorkerEntity extends PathfinderMob implements GeoEntity {
+public class WarehouseWorkerEntity extends PathfinderMob {
 
     private static final EntityDataAccessor<Boolean> DATA_IS_WORKING =
         SynchedEntityData.defineId(WarehouseWorkerEntity.class, EntityDataSerializers.BOOLEAN);
-
-    private static final RawAnimation ANIM_IDLE  = RawAnimation.begin().thenLoop("animation.warehouse_worker.idle");
-    private static final RawAnimation ANIM_WALK  = RawAnimation.begin().thenLoop("animation.warehouse_worker.walk");
-    private static final RawAnimation ANIM_CARRY = RawAnimation.begin().thenLoop("animation.warehouse_worker.carry");
-
-    private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
     private BlockPos homePosition = BlockPos.ZERO;
     private WarehouseTier tier = WarehouseTier.WOOD;
@@ -75,20 +63,6 @@ public class WarehouseWorkerEntity extends PathfinderMob implements GeoEntity {
                 discard();
             }
         }
-    }
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "main", 5, state -> {
-            if (isWorking()) return state.setAndContinue(ANIM_CARRY);
-            if (state.isMoving()) return state.setAndContinue(ANIM_WALK);
-            return state.setAndContinue(ANIM_IDLE);
-        }));
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return geoCache;
     }
 
     public boolean isWorking() { return this.entityData.get(DATA_IS_WORKING); }

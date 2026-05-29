@@ -39,10 +39,6 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
     mavenLocal()
-    maven {
-        name = "GeckoLib"
-        url = "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
-    }
 }
 
 // NeoForge 21.1.x puts ASM 9.7 on the JVM module path. The NeoGradle plugin
@@ -60,7 +56,6 @@ configurations.all {
 
 dependencies {
     implementation "net.neoforged:neoforge:${project.neo_version}"
-    implementation "software.bernie.geckolib:geckolib-neoforge-1.21.1:4.7.2"
 }
 
 jar {
