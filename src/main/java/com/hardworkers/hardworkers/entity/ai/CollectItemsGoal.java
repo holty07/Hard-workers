@@ -19,15 +19,16 @@ import java.util.List;
 
 public class CollectItemsGoal extends Goal {
 
-    private static final int SEARCH_RADIUS = 32;
+    private static final int SEARCH_RADIUS = 192; // 12 chunks
     private static final double REACH_SQ   = 9.0;  // 3-block reach
     private static final int IDLE_COOLDOWN = 60;   // ticks to wait when nothing found
 
     private final WarehouseWorkerEntity worker;
     private BlockPos sourcePos = null;
     private int cooldown = 0;
-    private BlockPos cachedSource = null;
-    private int fullScanCooldown = 0;
+    private final List<BlockPos> knownSources = new ArrayList<>();
+    private int bigScanCooldown = 0;   // reset to 1200 (~1 min) after each full scan
+    private int checkCooldown = 0;     // reset to 40 (~2 sec) after each quick check
 
     public CollectItemsGoal(WarehouseWorkerEntity worker) {
         this.worker = worker;
@@ -49,7 +50,7 @@ public class CollectItemsGoal extends Goal {
         if (wbe == null || wbe.isFull()) { cooldown = IDLE_COOLDOWN; return false; }
 
         sourcePos = findSource(worker.level(), home);
-        if (sourcePos == null) { cooldown = IDLE_COOLDOWN; return false; }
+        if (sourcePos == null) { return false; }
         return true;
     }
 
@@ -90,7 +91,6 @@ public class CollectItemsGoal extends Goal {
                 collectItems();
                 if (worker.carrying.isEmpty()) {
                     // Source was empty — try again later
-                    cachedSource = null;
                     sourcePos = null;
                     cooldown = IDLE_COOLDOWN;
                     stop();
@@ -131,7 +131,6 @@ public class CollectItemsGoal extends Goal {
                 collected++;
             }
         }
-        cachedSource = sourcePos;
     }
 
     private void depositItems(BlockPos home) {
@@ -161,36 +160,52 @@ public class CollectItemsGoal extends Goal {
     }
 
     private BlockPos findSource(Level level, BlockPos home) {
-        // Try cached source first (avoids full scan in steady state)
-        if (cachedSource != null) {
-            BlockEntity be = level.getBlockEntity(cachedSource);
-            if (isNonEmptySource(be)) return cachedSource;
-            cachedSource = null;
-        }
+        bigScanCooldown--;
+        checkCooldown--;
 
-        if (fullScanCooldown-- > 0) return null;
-        fullScanCooldown = 40;
-
-        BlockPos closest = null;
-        int closestDistSq = Integer.MAX_VALUE;
-        for (int dx = -SEARCH_RADIUS; dx <= SEARCH_RADIUS; dx++) {
-            for (int dy = -4; dy <= 4; dy++) {
-                for (int dz = -SEARCH_RADIUS; dz <= SEARCH_RADIUS; dz++) {
-                    BlockPos p = home.offset(dx, dy, dz);
-                    if (p.equals(home)) continue;
-                    BlockEntity be = level.getBlockEntity(p);
-                    if (isNonEmptySource(be)) {
-                        int distSq = (int) home.distSqr(p);
-                        if (distSq < closestDistSq) {
-                            closestDistSq = distSq;
-                            closest = p.immutable();
+        if (bigScanCooldown <= 0) {
+            // Full scan: rebuild the list of all known worker blocks in range
+            bigScanCooldown = 1200;
+            checkCooldown = 0; // force immediate quick-check after rebuild
+            knownSources.clear();
+            for (int dx = -SEARCH_RADIUS; dx <= SEARCH_RADIUS; dx++) {
+                for (int dy = -4; dy <= 4; dy++) {
+                    for (int dz = -SEARCH_RADIUS; dz <= SEARCH_RADIUS; dz++) {
+                        BlockPos p = home.offset(dx, dy, dz);
+                        if (p.equals(home)) continue;
+                        if (isWorkerBlock(level.getBlockEntity(p))) {
+                            knownSources.add(p.immutable());
                         }
                     }
                 }
             }
         }
-        cachedSource = closest;
-        return closest;
+
+        if (checkCooldown <= 0) {
+            // Quick check: prune stale entries, find closest non-empty
+            checkCooldown = 40;
+            knownSources.removeIf(p -> !isWorkerBlock(level.getBlockEntity(p)));
+            BlockPos closest = null;
+            double closestDistSq = Double.MAX_VALUE;
+            for (BlockPos p : knownSources) {
+                if (isNonEmptySource(level.getBlockEntity(p))) {
+                    double d = home.distSqr(p);
+                    if (d < closestDistSq) {
+                        closestDistSq = d;
+                        closest = p;
+                    }
+                }
+            }
+            return closest;
+        }
+
+        return null;
+    }
+
+    private boolean isWorkerBlock(BlockEntity be) {
+        return be instanceof LumberjackBlockEntity
+            || be instanceof MinerBlockEntity
+            || be instanceof FarmerBlockEntity;
     }
 
     private boolean isNonEmptySource(BlockEntity be) {
