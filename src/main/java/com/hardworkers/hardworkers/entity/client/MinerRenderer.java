@@ -1,26 +1,14 @@
 package com.hardworkers.hardworkers.entity.client;
 
 import com.hardworkers.hardworkers.entity.MinerEntity;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.geom.ModelLayers;
+import com.hardworkers.hardworkers.entity.client.model.MinerModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
-import net.minecraft.client.renderer.entity.layers.ItemInHandLayer;
-import net.minecraft.resources.ResourceLocation;
+import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
-public class MinerRenderer extends HumanoidMobRenderer<MinerEntity, HumanoidModel<MinerEntity>> {
-
-    private static final ResourceLocation TEXTURE =
-        ResourceLocation.fromNamespaceAndPath("hardworkers", "textures/entity/miner.png");
+public class MinerRenderer extends GeoEntityRenderer<MinerEntity> {
 
     public MinerRenderer(EntityRendererProvider.Context ctx) {
-        super(ctx, new HumanoidModel<>(ctx.bakeLayer(ModelLayers.PLAYER)), 0.5f);
-        addLayer(new ItemInHandLayer<>(this, ctx.getItemInHandRenderer()));
-    }
-
-    @Override
-    public ResourceLocation getTextureLocation(MinerEntity entity) {
-        return TEXTURE;
+        super(ctx, new MinerModel());
+        this.shadowRadius = 0.5f;
     }
 }
-

@@ -8,11 +8,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
 import java.util.*;
 
@@ -29,11 +31,13 @@ public class ChopTreeGoal extends Goal {
     private static final int MAX_LOGS = 256;
     /** Margin around the log bounding box to scan for leaf blocks. */
     private static final int LEAF_MARGIN = 3;
+    private static final double PICKUP_RADIUS = 2.0;
 
     private final LumberjackEntity lumberjack;
     private int chopTimer = 0;
     private final List<BlockPos> logsToChop = new ArrayList<>();
     private final List<BlockPos> leavesToClear = new ArrayList<>();
+    private boolean clearingLeaves = false;
     private Block saplingType = null;
     private BlockPos plantPos = null;
 
@@ -50,7 +54,7 @@ public class ChopTreeGoal extends Goal {
     @Override
     public boolean canContinueToUse() {
         return lumberjack.getTargetTree() != null
-            && (!logsToChop.isEmpty() || !lumberjack.getNavigation().isDone());
+            && (!logsToChop.isEmpty() || clearingLeaves || !lumberjack.getNavigation().isDone());
     }
 
     @Override
@@ -71,6 +75,9 @@ public class ChopTreeGoal extends Goal {
         BlockPos treePos = lumberjack.getTargetTree();
         if (treePos == null) return;
 
+        lumberjack.setWorking(true);
+        pickUpNearbyItems();
+
         double distSq = lumberjack.distanceToSqr(
             treePos.getX() + 0.5, treePos.getY(), treePos.getZ() + 0.5
         );
@@ -81,22 +88,32 @@ public class ChopTreeGoal extends Goal {
         }
 
         chopTimer++;
-        if (chopTimer >= chopInterval()) {
-            chopTimer = 0;
-            chopNext();
-        }
-
-        if (logsToChop.isEmpty()) {
-            clearLeaves();
-            plantSapling();
-            lumberjack.setTargetTree(null);
+        if (!clearingLeaves) {
+            if (chopTimer >= chopInterval()) {
+                chopTimer = 0;
+                chopNext();
+            }
+            if (logsToChop.isEmpty()) {
+                clearingLeaves = true;
+                chopTimer = chopInterval(); // fire first leaf immediately next check
+            }
+        } else {
+            if (chopTimer >= chopInterval()) {
+                chopTimer = 0;
+                if (!clearLeafOne()) {
+                    plantSapling();
+                    lumberjack.setTargetTree(null);
+                }
+            }
         }
     }
 
     @Override
     public void stop() {
+        lumberjack.setWorking(false);
         logsToChop.clear();
         leavesToClear.clear();
+        clearingLeaves = false;
         saplingType = null;
         plantPos = null;
         chopTimer = 0;
@@ -141,20 +158,41 @@ public class ChopTreeGoal extends Goal {
         }
     }
 
-    /** Instantly removes all leaf blocks that were part of this tree, collecting their drops. */
-    private void clearLeaves() {
+    /**
+     * Removes the next leaf block in {@link #leavesToClear}, collecting its drops.
+     * Skips already-decayed leaves without wasting a tick interval.
+     * @return true if there are still more leaves to process
+     */
+    private boolean clearLeafOne() {
         Level level = lumberjack.level();
-        if (!(level instanceof ServerLevel serverLevel)) return;
-
-        for (BlockPos leafPos : leavesToClear) {
+        if (!(level instanceof ServerLevel serverLevel)) {
+            leavesToClear.clear();
+            return false;
+        }
+        while (!leavesToClear.isEmpty()) {
+            BlockPos leafPos = leavesToClear.remove(0);
             BlockState leafState = serverLevel.getBlockState(leafPos);
-            if (!leafState.is(BlockTags.LEAVES)) continue; // may have already decayed
-
+            if (!leafState.is(BlockTags.LEAVES)) continue; // already decayed, skip
             List<ItemStack> drops = Block.getDrops(leafState, serverLevel, leafPos, null);
             serverLevel.setBlock(leafPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+            serverLevel.levelEvent(2001, leafPos, Block.getId(leafState));
             depositItems(serverLevel, drops);
+            return !leavesToClear.isEmpty();
         }
-        leavesToClear.clear();
+        return false;
+    }
+
+    /** Picks up any nearby item entities and deposits them into the block entity. */
+    private void pickUpNearbyItems() {
+        Level level = lumberjack.level();
+        if (!(level instanceof ServerLevel serverLevel)) return;
+        AABB box = lumberjack.getBoundingBox().inflate(PICKUP_RADIUS);
+        for (ItemEntity itemEnt : serverLevel.getEntitiesOfClass(ItemEntity.class, box)) {
+            if (itemEnt.isRemoved()) continue;
+            ItemStack stack = itemEnt.getItem().copy();
+            itemEnt.discard();
+            depositItems(serverLevel, List.of(stack));
+        }
     }
 
     private void plantSapling() {

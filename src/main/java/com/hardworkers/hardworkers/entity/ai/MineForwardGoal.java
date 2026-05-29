@@ -54,6 +54,7 @@ public class MineForwardGoal extends Goal {
 
     @Override
     public void stop() {
+        miner.setWorking(false);
         mineTimer = 0;
         miner.getNavigation().stop();
     }
@@ -67,6 +68,8 @@ public class MineForwardGoal extends Goal {
 
         Direction facing = getHomeFacing();
         if (facing == null) return;
+
+        miner.setWorking(true);
 
         BlockPos homePos  = miner.getHomePosition();
         // Mine behind the block (opposite of FACING so the drill-face points toward the player)
